@@ -1,0 +1,6 @@
+{
+  "name": "Paul Chase's github",
+  "tagline": "code",
+  "body": "# Hey\r\n\r\n![Picture of Paul Chase holding a pony named Luna.](https://goo.gl/photos/RDjo4kbdjhKfzVo57)\r\n\r\n## Projects  \r\n\r\ni3_parts - the source for the Nova I3 3d printer, as built by build groups at Nova Labs.  Status: Working!  \r\n\r\nDoppelbot - an easy to build large-format 3d printer.  Status: working, actively updating.  \r\n\r\nPrintedBallMachine - a modular marble machine designed to be mounted on pegboard and infinitely extended.  Status: works, actively updated.  \r\n\r\nBertha - a large deltabot.  Status: Printer works, not actively updating.  \r\n\r\nBB8 - The spherical droid from Star Wars: The Force Awakens.  Printed/thermoformed shell and innards.  Status: in progress.  \r\n\r\nFilameat - a meat grinder designed to turn plastic parts into shreds, ready for re-extruding into filament.  Status: abandoned.  I don't think I can get it working :-(  \r\n\r\nRostock-Redux - My first Deltabot, superseded by Bertha.  Status: abandoned.  \r\n",
+  "note": "Don't delete this file! It's used internally to help with page regeneration."
+}
