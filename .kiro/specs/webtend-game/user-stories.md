@@ -104,3 +104,76 @@ All implementation tasks must reference a user story from this list. If a task d
 - All 12 property tests pass (Properties 1–12)
 - Example-based tests cover LevelLoader, HUD, InputHandler, and EnemyAI
 - Full test suite runs after every task
+
+---
+
+## US-11: Asset Skinning & Decoration
+
+**As an** Artist,  
+**I want** to be able to decorate or skin all assets of the game,  
+**so that** I can give the game a unique visual identity without touching game logic.
+
+### Epics
+
+#### Epic 11.1: Player Ship Skinning
+
+Replace the procedural ConeGeometry ship with an externally loaded model (GLTF/GLB) or allow swapping materials/textures on the existing geometry.
+
+**Complete when:**
+- A ship model or texture can be swapped by replacing a single asset file
+- The ship renders correctly with the new skin at all angles
+- No game logic changes are required to apply a new skin
+
+#### Epic 11.2: Enemy Ship Skinning
+
+Allow enemy ships to use custom models or textures instead of the default red sphere.
+
+**Complete when:**
+- An enemy model or texture can be swapped by replacing a single asset file
+- Directional heading indicators remain visible on the skinned model
+- Enemy bounding sphere radius is preserved regardless of visual model
+
+#### Epic 11.3: Generator Skinning
+
+Allow generators to use custom models or textures instead of the default green sphere.
+
+**Complete when:**
+- A generator model or texture can be swapped by replacing a single asset file
+- The HP bar remains correctly positioned above the skinned model
+- Generator bounding sphere radius is preserved regardless of visual model
+
+#### Epic 11.4: Maze Wall Skinning
+
+Allow maze walls to use custom textures or materials instead of the default gray.
+
+**Complete when:**
+- Wall textures/materials can be changed by replacing asset files or a theme config
+- Walls remain physically correct AABBs regardless of visual appearance
+- Different levels can use different wall themes
+
+#### Epic 11.5: Explosion Effect Skinning
+
+Allow explosion visual effects to use custom particle systems, shaders, or sprite sheets.
+
+**Complete when:**
+- Explosion visuals can be replaced without changing ExplosionSystem logic
+- Chain vs. initial explosion distinction remains visually clear
+- The 0.3s minimum display time is preserved
+
+#### Epic 11.6: HUD Theming
+
+Allow the HUD overlay to be restyled via CSS themes or a theme config file.
+
+**Complete when:**
+- HUD colors, fonts, and bar styles can be changed via a single CSS file or theme config
+- All HUD elements remain legible at 360–2560px viewport widths
+- No JavaScript changes required to apply a new theme
+
+#### Epic 11.7: Skybox / Environment Skinning
+
+Allow the scene background/skybox to be customized per level or globally.
+
+**Complete when:**
+- A skybox or background color can be set via a config or asset file
+- Different levels can have different environments
+- No Renderer.js logic changes required beyond initial setup

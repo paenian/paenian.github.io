@@ -14,6 +14,7 @@ Tracks the implementation status of each user story.
 | US-8 | HUD & Game State Display | ✅ Complete | 8.1, 8.2 | HUD.js, CSS overlay |
 | US-9 | Static Hosting & Compatibility | ✅ Complete | 1, 13.1, 14 | index.html, WebGL check, import maps |
 | US-10 | Test Coverage & Quality | ✅ Complete | 2.2–2.5, 4.3, 5.2–5.4, 6.2–6.5, 8.3, 15.1–15.2 | 149 tests, all passing |
+| US-11 | Asset Skinning & Decoration | ⬜ Not Started | — | 7 epics: ship, enemy, generator, walls, explosions, HUD, skybox |
 
 ---
 
@@ -28,9 +29,9 @@ Tracks the implementation status of each user story.
 
 ## Summary
 
-- **Total Stories:** 10
+- **Total Stories:** 11
 - **Complete:** 10
 - **In Progress:** 0
-- **Not Started:** 0
+- **Not Started:** 1
 
 Last updated: 2026-06-23
