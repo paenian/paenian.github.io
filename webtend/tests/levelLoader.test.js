@@ -257,15 +257,17 @@ describe('loadLevel', () => {
   test('throws LevelConfigError when fetch returns a non-ok response', async () => {
     fetch.mockResolvedValueOnce({ ok: false, status: 404, statusText: 'Not Found' });
 
-    await expect(loadLevel(99)).rejects.toThrowError(LevelConfigError);
-    await expect(loadLevel(99)).rejects.toThrowError(/404/);
+    const err = await loadLevel(99).catch((e) => e);
+    expect(err).toBeInstanceOf(LevelConfigError);
+    expect(err.message).toMatch(/404/);
   });
 
   test('throws LevelConfigError when the network request fails', async () => {
     fetch.mockRejectedValueOnce(new TypeError('Network failure'));
 
-    await expect(loadLevel(1)).rejects.toThrowError(LevelConfigError);
-    await expect(loadLevel(1)).rejects.toThrowError(/Network failure/);
+    const err = await loadLevel(1).catch((e) => e);
+    expect(err).toBeInstanceOf(LevelConfigError);
+    expect(err.message).toMatch(/Network failure/);
   });
 
   test('throws LevelConfigError when JSON is invalid / parse fails', async () => {
