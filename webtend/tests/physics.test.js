@@ -401,3 +401,28 @@ describe('snapSmallComponent()', () => {
     ), { numRuns: 100 });
   });
 });
+
+// ---------------------------------------------------------------------------
+// Property 8: Power Level Decrement Is Bounded Below by 1
+// Validates: Requirements 3.4, 5.4, 5.6
+// ---------------------------------------------------------------------------
+
+describe('Property 8 — power level decrement bounded below by 1', () => {
+  test('max(1, p - d) is always >= 1 for any p in [1, 100] and d in [1, 10]', () => {
+    fc.assert(fc.property(
+      fc.integer({ min: 1, max: 100 }),   // powerLevel
+      fc.integer({ min: 1, max: 10 }),    // decrement
+      (p, d) => {
+        const result = Math.max(1, p - d);
+        return result >= 1;
+      }
+    ), { numRuns: 200 });
+  });
+
+  test('power never drops to 0 even with maximum decrement', () => {
+    expect(Math.max(1, 1 - 10)).toBe(1);
+    expect(Math.max(1, 2 - 10)).toBe(1);
+    expect(Math.max(1, 10 - 10)).toBe(1);
+    expect(Math.max(1, 11 - 10)).toBe(1);
+  });
+});

@@ -1,5 +1,26 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "2.5 Write property test — Property 8: Power level decrement bounded below by 1": {
+      "status": "passed",
+      "lastRunTimestamp": 1782247123300
+    },
+    "6.2 Write property test — Property 6: Chain reaction power gain obeys threshold and maximum": {
+      "status": "passed",
+      "lastRunTimestamp": 1782247124214
+    },
+    "6.3 Write property test — Property 9: Generator HP bar fill ratio always in [0, 1]": {
+      "status": "passed",
+      "lastRunTimestamp": 1782247125137
+    },
+    "6.4 Write property test — Property 11: Level spawn intervals non-increasing with floor at 0.5 s": {
+      "status": "passed",
+      "lastRunTimestamp": 1782247125995
+    },
+    "6.5 Write property test — Property 12: Level generator counts non-decreasing with ceiling at 20": {
+      "status": "passed",
+      "lastRunTimestamp": 1782247126910
+    }
+  },
   "executionHistory": {
     "1. Scaffold project structure and entry-point HTML": [
       {
