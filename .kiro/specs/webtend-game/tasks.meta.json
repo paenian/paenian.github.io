@@ -1,0 +1,229 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Scaffold project structure and entry-point HTML": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243382919
+      },
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243399835
+      },
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243940136
+      }
+    ],
+    "2.1 Implement `Physics.js` with all pure vector functions: `reflect(velocity, wallNormal)`, `applyAcceleration(vel, dir, accel, maxSpeed, dt)`, `applyDeceleration(vel, decelRate, dt)`, `clampSpeed(vel, maxSpeed)`, `checkSphereAABB(sphereCenter, sphereRadius, aabb)`, `checkSphereSphere(c1, r1, c2, r2)`, `snapSmallComponent(vel, threshold)` — all operating on plain `{x, y, z}` objects with no Three.js imports": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383002
+      },
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243401331
+      },
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782244164107
+      }
+    ],
+    "3. Implement `GameState.js` and shared data models": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383036
+      },
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243402043
+      }
+    ],
+    "4.1 Implement `loadLevel(index)` using `fetch` + JSON parse wrapped in try/catch; implement `validateLevelData(data)` that throws a typed `LevelConfigError` for missing or out-of-range fields (walls, generators, playerStart, config with all required keys and value ranges)": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383067
+      },
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243403011
+      }
+    ],
+    "4.2 Author the five level JSON files with distinct, valid configurations differing in at least one of: maze layout (wall counts/positions), number of generators, generator placement, or spawn interval; ensure Level N+1 spawn interval ≤ Level N interval; add open area large enough for 5+ chained explosions at initial power": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383100
+      },
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243404386
+      }
+    ],
+    "5.1 Implement the pure, DOM-free parts of `ExplosionSystem.js`: `calcRadius(powerLevel, config)` returning `base_radius + powerLevel × radius_multiplier`, and `collectHits(center, radius, enemies, generators)` returning all entities whose bounding-sphere center is within `radius + entity.radius` of center": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383126
+      }
+    ],
+    "6.1 Implement the chain reward and power cap logic in `ExplosionSystem.js`: after chain drains, if `chainDepth ≥ chainThreshold` then `powerLevel = min(powerLevel + increment, maxPower)`; implement generator HP decrement on explosion hit, setting `pendingRemoval = true` when HP reaches zero": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383151
+      }
+    ],
+    "7. Checkpoint — verify all pure-logic tests pass": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383177
+      }
+    ],
+    "8.1 Implement `HUD.js` with all methods: `sync(gameState)`, `updatePowerBar(current, max)`, `updateGeneratorBars(generators)`, `updateLevel(levelIndex)`, `showLevelComplete()`, `hideLevelComplete()`, `showGameOver()`, `showWebGLError()`, `showAssetError(assetName)` — all using DOM manipulation only, no canvas drawing": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383207
+      }
+    ],
+    "8.2 Write CSS in `index.html` (or a linked stylesheet) for the HUD overlay: fixed-position container, power bar, generator bars list, level number; ensure legibility at 360–2560 px viewport widths with minimum 12 CSS px text and 6 CSS px bar height; use `width: X%` fill driven by JS": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383232
+      }
+    ],
+    "9. Implement `InputHandler.js`": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383256
+      }
+    ],
+    "10.1 Implement `Renderer` constructor: create `THREE.WebGLRenderer` on the provided canvas, a `THREE.Scene`, and a `THREE.PerspectiveCamera`; build the two-level camera rig (`rigYaw` Object3D → `rigPitch` Object3D → camera at local offset `(0, 3, 10)`)": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383290
+      }
+    ],
+    "10.2 Implement `buildScene(levelData)`: generate `THREE.BoxGeometry` meshes for each wall AABB, `THREE.SphereGeometry` for generator meshes with HP bar `<div>` elements above them, and a distinct spaceship mesh for the player (simple geometry is fine); add ambient and directional lights": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383314
+      }
+    ],
+    "10.3 Implement `addEnemy(enemy)` and `removeEnemy(enemy)`: create a sphere mesh with surface dimple indicators for heading direction (normal-mapped or programmatic), add to/remove from scene, keep `enemy.mesh` reference in sync; implement `removeGenerator(generator)` to remove mesh and HP bar element": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383340
+      }
+    ],
+    "10.4 Implement `spawnExplosionEffect(pos, radius, isChain)`: add a semi-transparent sphere mesh at `pos` with `radius` scale; use distinct material color/opacity for chain vs. initial explosions; schedule removal after 0.3 s using `setTimeout` or a timed list drained in `render()`": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383366
+      }
+    ],
+    "10.5 Implement `updateCameraRig(shipPos, yaw, pitch)`: set `rigYaw.position` to `shipPos`, apply `yaw` rotation to `rigYaw`, apply `pitch` (clamped to ±80°) to `rigPitch`; add camera-clip check (raycast from ship to camera default offset, reposition camera to nearest unobstructed point, minimum 1 unit from ship)": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383392
+      }
+    ],
+    "10.6 Implement `render()`: call `renderer.render(scene, camera)`; batch-remove any entities flagged `pendingRemoval` from `gameState` arrays and the scene before the render call": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383418
+      }
+    ],
+    "11. Implement `EnemyAI.js`": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383448
+      }
+    ],
+    "12. Implement `ExplosionSystem.js` full class with FIFO queue": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383473
+      }
+    ],
+    "13.1 Implement `Game.start()`: check WebGL support (create offscreen canvas, call `getContext('webgl2') || getContext('webgl')`); on failure call `HUD.showWebGLError()` and return; otherwise begin `LevelLoader.loadLevel(1)` and on success enter `PLAYING` phase": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383498
+      }
+    ],
+    "13.2 Implement `Game.update(deltaTime)`: read `InputHandler`, compute normalized movement direction, call `Physics.applyAcceleration` / `applyDeceleration` for the player ship; call `Physics.checkSphereAABB` for player-wall collisions, `Physics.checkSphereSphere` for player-enemy collisions; apply `Physics.snapSmallComponent` after each reflection; update `playerShip.position` from velocity; call `EnemyAI.update` per enemy; call `ExplosionSystem.step()`; call `HUD.sync(gameState)`; call `Renderer.updateCameraRig`": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383523
+      }
+    ],
+    "13.3 Implement enemy collision resolution in `Game.update`: when player contacts an enemy, decrease `powerLevel` via `max(1, powerLevel - decrement)` (Requirement 5.6), deflect both ships away, do NOT trigger explosion; when power reaches minimum and decrement would push below 1, clamp to 1": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383556
+      }
+    ],
+    "13.4 Implement enemy spawn logic: for each generator with HP > 0, if `now - lastSpawnTime ≥ spawnIntervalSeconds`, call `Renderer.addEnemy(newEnemy)` and push to `gameState.enemies`": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383581
+      }
+    ],
+    "13.5 Implement `Game.onLevelComplete()` and `Game.onGameOver()`: show appropriate HUD screen; for level complete, wait 2 seconds then call `Game.loadLevel(levelIndex + 1)`; reset `powerLevel` to `config.initialPowerLevel` on level advance; handle missing/invalid next level by showing error and remaining on current level": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383605
+      }
+    ],
+    "14. Implement `main.js` bootstrap and wire everything together": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383630
+      }
+    ],
+    "16. Final checkpoint — all tests pass": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782243383655
+      }
+    ],
+    "2. Implement pure Physics module and property tests": [
+      {
+        "executionId": "0d10440a-7e5c-4693-a391-ae0049a6f34d",
+        "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
+        "timestamp": 1782244164157
+      }
+    ]
+  }
+}

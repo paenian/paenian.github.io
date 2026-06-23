@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Webtend</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.168.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #000;
+      overflow: hidden;
+      font-family: 'Courier New', Courier, monospace;
+      color: #fff;
+    }
+
+    #game-canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* HUD overlay — fixed on top of the canvas */
+    #hud {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      pointer-events: none;
+      z-index: 10;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* Level display */
+    #level-display {
+      font-size: clamp(12px, 2vw, 20px);
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 6px #0ff;
+    }
+
+    /* Power bar */
+    #power-bar-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #power-bar-label {
+      font-size: clamp(12px, 1.5vw, 16px);
+      min-width: 60px;
+      white-space: nowrap;
+    }
+
+    #power-bar-track {
+      flex: 1;
+      max-width: 300px;
+      height: max(6px, 0.8vw);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    #power-bar-fill {
+      height: 100%;
+      width: 5%; /* updated by HUD.js */
+      background: linear-gradient(90deg, #0ff, #08f);
+      transition: width 0.1s ease;
+    }
+
+    #power-bar-value {
+      font-size: clamp(12px, 1.5vw, 16px);
+      min-width: 36px;
+    }
+
+    /* Generator bars */
+    #generator-bar-container {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    #generator-bar-container .gen-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #generator-bar-container .gen-bar-label {
+      font-size: clamp(12px, 1.2vw, 14px);
+      min-width: 24px;
+      opacity: 0.8;
+    }
+
+    #generator-bar-container .gen-bar-track {
+      width: clamp(80px, 15vw, 180px);
+      height: max(6px, 0.7vw);
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    #generator-bar-container .gen-bar-fill {
+      height: 100%;
+      width: 100%; /* updated by HUD.js */
+      background: linear-gradient(90deg, #f80, #f40);
+      transition: width 0.1s ease;
+    }
+
+    /* Overlay screens */
+    .overlay-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.75);
+      font-size: clamp(16px, 4vw, 48px);
+      text-align: center;
+      gap: 16px;
+      z-index: 20;
+      pointer-events: none;
+    }
+
+    .overlay-screen.hidden {
+      display: none;
+    }
+
+    .overlay-screen .overlay-title {
+      font-size: clamp(24px, 6vw, 72px);
+      text-shadow: 0 0 12px currentColor;
+    }
+
+    #level-complete-screen {
+      color: #0f8;
+    }
+
+    #game-over-screen {
+      color: #f44;
+    }
+
+    #error-screen {
+      color: #ff0;
+      font-size: clamp(12px, 2vw, 20px);
+      padding: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="game-canvas"></canvas>
+
+  <!-- HUD overlay -->
+  <div id="hud">
+    <div id="level-display">LEVEL 1</div>
+
+    <div id="power-bar-container">
+      <span id="power-bar-label">POWER</span>
+      <div id="power-bar-track">
+        <div id="power-bar-fill"></div>
+      </div>
+      <span id="power-bar-value">5</span>
+    </div>
+
+    <div id="generator-bar-container">
+      <!-- Generator HP bars are added/removed by HUD.js -->
+    </div>
+  </div>
+
+  <!-- Level complete screen -->
+  <div id="level-complete-screen" class="overlay-screen hidden">
+    <div class="overlay-title">LEVEL COMPLETE</div>
+    <div>Advancing to next level…</div>
+  </div>
+
+  <!-- Game over screen -->
+  <div id="game-over-screen" class="overlay-screen hidden">
+    <div class="overlay-title">GAME OVER</div>
+    <div>Your power was depleted.</div>
+  </div>
+
+  <!-- Error screen -->
+  <div id="error-screen" class="overlay-screen hidden">
+    <div class="overlay-title">ERROR</div>
+    <div id="error-message"></div>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>

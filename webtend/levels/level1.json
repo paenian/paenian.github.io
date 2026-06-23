@@ -1,0 +1,28 @@
+{
+  "id": 1,
+  "initialPowerLevel": 5,
+  "walls": [
+    { "min": [-50, 0, -50], "max": [-45, 10, 50] },
+    { "min": [45, 0, -50], "max": [50, 10, 50] },
+    { "min": [-50, 0, -50], "max": [50, 10, -45] },
+    { "min": [-50, 0, 45], "max": [50, 10, 50] },
+    { "min": [-45, 0, -10], "max": [-40, 10, 10] },
+    { "min": [40, 0, -10], "max": [45, 10, 10] }
+  ],
+  "generators": [
+    { "id": "g1", "position": [0, 0, 42], "maxHp": 5, "spawnIntervalSeconds": 10.0 }
+  ],
+  "playerStart": [0, 0, 0],
+  "config": {
+    "baseExplosionRadius": 5,
+    "radiusMultiplier": 0.5,
+    "chainThreshold": 3,
+    "powerGainIncrement": 1,
+    "powerDecrement": 1,
+    "maxPower": 100,
+    "enemySpeed": 8,
+    "playerMaxSpeed": 50,
+    "playerAcceleration": 20,
+    "decelerationTime": 0.5
+  }
+}

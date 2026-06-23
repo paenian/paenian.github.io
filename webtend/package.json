@@ -1,0 +1,14 @@
+{
+  "name": "webtend",
+  "version": "0.1.0",
+  "description": "Browser-based 3D action game — Webtend",
+  "type": "module",
+  "scripts": {
+    "test": "vitest --run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "fast-check": "3.22.0",
+    "vitest": "2.1.9"
+  }
+}
