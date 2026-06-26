@@ -8,6 +8,16 @@ export class ExplosionSystem {
   constructor(gameState, config) {
     this.gameState = gameState;
     this.config = config;
+    this.renderer = null;
+  }
+
+  /**
+   * Set the renderer reference for spawning visual effects.
+   * Called after construction to avoid circular dependency issues.
+   * @param {import('./Renderer.js').Renderer} renderer
+   */
+  setRenderer(renderer) {
+    this.renderer = renderer;
   }
 
   /**
@@ -72,6 +82,12 @@ export class ExplosionSystem {
 
     // Dequeue the next job (FIFO — shift from front).
     const job = this.gameState.explosionQueue.shift();
+
+    // Spawn visual effect for this explosion
+    if (this.renderer) {
+      this.renderer.spawnExplosionEffect(job.center, job.radius, job.isChain);
+    }
+
     this.processExplosion(job.center, job.radius);
 
     // After processing, check if the queue is now empty (chain resolved).

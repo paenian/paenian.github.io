@@ -19,6 +19,7 @@ const renderer = new Renderer(canvas, GameState);
 const hud = new HUD();
 const enemyAI = new EnemyAI({ enemySpeed: 5, avoidRadius: 5 }); // defaults, updated per level
 const explosionSystem = new ExplosionSystem(GameState, {}); // config set on level load
+explosionSystem.setRenderer(renderer);
 
 // Instantiate Game with dependency injection
 const game = new Game({ renderer, hud, inputHandler, explosionSystem, enemyAI });
@@ -30,10 +31,8 @@ canvas.addEventListener('click', () => {
       inputHandler.requestPointerLock();
     } else {
       // Player click triggers explosion at ship position
+      // Visual effects are handled automatically by ExplosionSystem.step()
       explosionSystem.onPlayerClick(playerShip.position);
-      // Spawn visual effect
-      const radius = explosionSystem.calcRadius(GameState.powerLevel);
-      renderer.spawnExplosionEffect(playerShip.position, radius, false);
     }
   }
 });

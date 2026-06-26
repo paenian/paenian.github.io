@@ -20,3 +20,28 @@ Changed enemy movement to use a fixed heading direction set at spawn time. When 
 - `EnemyAI.js` — Removed player-seeking, added straight-line movement with wall reflection
 - `Game.js` — Set `enemy.heading` at spawn time (direction from generator toward player)
 - `tests/enemyAI.test.js` — Updated tests to match new straight-line behavior
+
+
+---
+
+## BUG-2: Chain explosions have no visual effect
+
+**Status:** Fixed  
+**Reported:** 2025-06-23  
+**User Story:** US-2 (Explosion & Chain Reactions)  
+**Severity:** Gameplay / Visual  
+
+**Description:**  
+When the player clicks and the initial explosion hits an enemy, the enemy is destroyed and a chain explosion is enqueued at the enemy's position. However, no visual explosion effect is rendered for the chain explosions — only the initial player explosion gets a visual. This makes it appear that enemies simply vanish rather than exploding, and the chain reaction is invisible.
+
+**Root Cause:**  
+`renderer.spawnExplosionEffect()` is only called in `main.js` for the initial player click. The `ExplosionSystem.processExplosion()` method handles chain logic but has no reference to the renderer to spawn visual effects.
+
+**Fix:**  
+- Give `ExplosionSystem` an optional `renderer` reference (set via a setter after construction to avoid circular deps)
+- In `processExplosion()`, call `renderer.spawnExplosionEffect()` for the current explosion being processed (both initial and chain)
+- Remove the manual `spawnExplosionEffect` call from `main.js` (now handled automatically by the system)
+
+**Files Changed:**
+- `ExplosionSystem.js` — Added `setRenderer()` method; `processExplosion()` now spawns visual effects
+- `main.js` — Calls `explosionSystem.setRenderer(renderer)` after construction; removed manual effect spawn from click handler
