@@ -163,6 +163,33 @@
       font-size: clamp(12px, 2vw, 20px);
       padding: 24px;
     }
+
+    /* Debug toggle button */
+    #debug-toggle {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      z-index: 30;
+      padding: 8px 16px;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      font-weight: bold;
+      background: rgba(255, 255, 0, 0.2);
+      color: #ff0;
+      border: 1px solid #ff0;
+      border-radius: 4px;
+      cursor: pointer;
+      pointer-events: auto;
+    }
+
+    #debug-toggle:hover {
+      background: rgba(255, 255, 0, 0.4);
+    }
+
+    #debug-toggle.active {
+      background: rgba(255, 255, 0, 0.5);
+      box-shadow: 0 0 8px #ff0;
+    }
   </style>
 </head>
 <body>
@@ -185,6 +212,9 @@
       <!-- Generator HP bars are added/removed by HUD.js -->
     </div>
   </div>
+
+  <!-- Debug toggle button -->
+  <button id="debug-toggle" title="Toggle top-down debug view">DEBUG</button>
 
   <!-- Level complete screen -->
   <div id="level-complete-screen" class="overlay-screen hidden">

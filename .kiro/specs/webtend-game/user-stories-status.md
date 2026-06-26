@@ -15,6 +15,7 @@ Tracks the implementation status of each user story.
 | US-9 | Static Hosting & Compatibility | ✅ Complete | 1, 13.1, 14 | index.html, WebGL check, import maps |
 | US-10 | Test Coverage & Quality | ✅ Complete | 2.2–2.5, 4.3, 5.2–5.4, 6.2–6.5, 8.3, 15.1–15.2 | 149 tests, all passing |
 | US-11 | Asset Skinning & Decoration | ⬜ Not Started | — | 7 epics: ship, enemy, generator, walls, explosions, HUD, skybox |
+| US-12 | Debug Top-Down View | 🔄 In Progress | — | Toggle between 3rd-person and top-down camera |
 
 ---
 
@@ -29,9 +30,9 @@ Tracks the implementation status of each user story.
 
 ## Summary
 
-- **Total Stories:** 11
+- **Total Stories:** 12
 - **Complete:** 10
-- **In Progress:** 0
+- **In Progress:** 1
 - **Not Started:** 1
 
 Last updated: 2026-06-23

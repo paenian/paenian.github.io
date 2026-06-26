@@ -177,3 +177,25 @@ Allow the scene background/skybox to be customized per level or globally.
 - A skybox or background color can be set via a config or asset file
 - Different levels can have different environments
 - No Renderer.js logic changes required beyond initial setup
+
+---
+
+## US-12: Debug Top-Down View
+
+**As a** developer,  
+**I want** a toggle for a top-down camera view,  
+**so that** I can observe and fine-tune gameplay mechanics from above.
+
+### Epics
+
+#### Epic 12.1: Top-Down Camera Toggle
+
+Add a UI button that switches between the normal third-person camera and a top-down orthographic view centered on the player ship.
+
+**Complete when:**
+- A visible "DEBUG" toggle button exists in the UI
+- Clicking it switches to a top-down orthographic camera looking straight down
+- The top-down view is centered on the player ship and follows it
+- Clicking again returns to the normal third-person camera
+- Game input (WASD, click-to-explode) still works in top-down mode
+- The toggle is visible at all times (will be hidden pre-release)

@@ -49,12 +49,29 @@ export class Renderer {
     // Ship mesh reference (assigned in buildScene)
     this.shipMesh = null;
 
+    // Debug top-down camera (orthographic)
+    this.debugMode = false;
+    const viewSize = 80; // units visible in each direction
+    this.debugCamera = new THREE.OrthographicCamera(
+      -viewSize, viewSize, viewSize, -viewSize, 0.1, 500
+    );
+    this.debugCamera.position.set(0, 200, 0);
+    this.debugCamera.lookAt(0, 0, 0);
+
     // Handle window resize
     this._onResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
       this.camera.aspect = width / height;
       this.camera.updateProjectionMatrix();
+      // Update debug camera aspect
+      const aspect = width / height;
+      const viewSize = 80;
+      this.debugCamera.left = -viewSize * aspect;
+      this.debugCamera.right = viewSize * aspect;
+      this.debugCamera.top = viewSize;
+      this.debugCamera.bottom = -viewSize;
+      this.debugCamera.updateProjectionMatrix();
       this.renderer.setSize(width, height);
     };
     window.addEventListener('resize', this._onResize);
@@ -209,6 +226,14 @@ export class Renderer {
   }
 
   /**
+   * Toggle between normal third-person camera and debug top-down view.
+   */
+  toggleDebugMode() {
+    this.debugMode = !this.debugMode;
+    return this.debugMode;
+  }
+
+  /**
    * 10.5 — updateCameraRig(shipPos, yaw, pitch)
    * Position and orient the camera rig to follow the ship.
    * @param {{ x: number, y: number, z: number }} shipPos
@@ -216,6 +241,12 @@ export class Renderer {
    * @param {number} pitch - Radians
    */
   updateCameraRig(shipPos, yaw, pitch) {
+    // Update debug camera to follow ship from above
+    if (this.debugMode) {
+      this.debugCamera.position.set(shipPos.x, 200, shipPos.z);
+      this.debugCamera.lookAt(shipPos.x, 0, shipPos.z);
+    }
+
     // Position rig at ship
     this.rigYaw.position.set(shipPos.x, shipPos.y, shipPos.z);
 
@@ -303,7 +334,8 @@ export class Renderer {
       );
     }
 
-    // Render the scene
-    this.renderer.render(this.scene, this.camera);
+    // Use debug camera if active, otherwise normal camera
+    const activeCamera = this.debugMode ? this.debugCamera : this.camera;
+    this.renderer.render(this.scene, activeCamera);
   }
 }

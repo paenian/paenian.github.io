@@ -38,6 +38,14 @@ canvas.addEventListener('click', () => {
   }
 });
 
+// Debug mode toggle
+const debugBtn = document.getElementById('debug-toggle');
+debugBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // Don't trigger explosion
+  const isDebug = renderer.toggleDebugMode();
+  debugBtn.classList.toggle('active', isDebug);
+});
+
 // Start the game (WebGL check + load level 1)
 game.start();
 
