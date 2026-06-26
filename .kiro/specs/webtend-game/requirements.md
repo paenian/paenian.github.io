@@ -68,7 +68,7 @@ Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pil
 #### Acceptance Criteria
 
 1. THE Enemy_Ship SHALL be rendered as a sphere with directional surface dimples that indicate the Enemy_Ship's heading.
-2. WHEN spawned, THE Enemy_Ship SHALL navigate toward the Player_Ship through Maze corridors without passing through Maze walls.
+2. WHEN spawned, THE Enemy_Ship SHALL receive a fixed heading direction pointing from its spawn position toward the Player_Ship's position at the moment of spawning, and SHALL move in a straight line along that heading at a constant speed without changing direction (except when reflecting off Maze walls).
 3. WHEN an Enemy_Ship collides with a Maze wall, THE Physics_Engine SHALL reverse the component of the Enemy_Ship's velocity that is perpendicular to the wall surface while preserving the parallel component and the speed magnitude.
 4. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL reduce the Player_Ship's Power_Level by one unit.
 5. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL deflect both ships away from each other regardless of whether the Power_Level reduction succeeds.

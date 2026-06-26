@@ -26,6 +26,7 @@
  * @property {string}        id
  * @property {Vec3}          position
  * @property {Vec3}          velocity
+ * @property {Vec3}          heading  - Fixed direction set at spawn time (unit vector).
  * @property {number}        radius   - Bounding sphere radius.
  * @property {THREE.Mesh}    mesh     - Reference to the Three.js scene object.
  * @property {boolean}       [pendingRemoval] - Flagged true during mid-frame removal.
