@@ -16,7 +16,7 @@
   "generators": [
     { "id": "g1", "position": [-40, 0, -40], "maxHp": 6, "spawnIntervalSeconds": 7.0 },
     { "id": "g2", "position": [40, 0, -40], "maxHp": 6, "spawnIntervalSeconds": 7.0 },
-    { "id": "g3", "position": [0, 0, 45], "maxHp": 6, "spawnIntervalSeconds": 7.0 }
+    { "id": "g3", "position": [20, 0, 45], "maxHp": 6, "spawnIntervalSeconds": 7.0 }
   ],
   "playerStart": [0, 0, 0],
   "config": {

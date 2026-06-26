@@ -45,3 +45,50 @@ When the player clicks and the initial explosion hits an enemy, the enemy is des
 **Files Changed:**
 - `ExplosionSystem.js` — Added `setRenderer()` method; `processExplosion()` now spawns visual effects
 - `main.js` — Calls `explosionSystem.setRenderer(renderer)` after construction; removed manual effect spawn from click handler
+
+
+---
+
+## BUG-3: Level 3 generator inside a wall
+
+**Status:** Fixed  
+**Reported:** 2025-06-23  
+**User Story:** US-4 (Enemy Ship Generators), US-6 (Maze Play Field)  
+**Severity:** Gameplay (blocker)  
+
+**Description:**  
+In level 3, generator g3 is positioned at `[0, 0, 45]` which is inside wall `[-10, 0, 20] to [10, 10, 50]`. The generator is unreachable and enemies spawn inside the wall.
+
+**Root Cause:**  
+Level 3 JSON was authored with a generator position that overlaps a wall AABB.
+
+**Fix:**  
+- Moved generator g3 in level3.json to `[20, 0, 45]` (outside all walls)
+- Added validation in `LevelLoader.validateLevelData()` that checks no generator position is inside any wall AABB
+
+**Files Changed:**
+- `levels/level3.json` — Moved g3 position
+- `LevelLoader.js` — Added wall-overlap validation for generators and playerStart
+
+---
+
+## BUG-4: Level 4 player spawns inside a wall
+
+**Status:** Fixed  
+**Reported:** 2025-06-23  
+**User Story:** US-1 (Ship Navigation), US-6 (Maze Play Field)  
+**Severity:** Gameplay (blocker)  
+
+**Description:**  
+In level 4, the player start position `[0, 0, 0]` is inside wall `[-5, 0, -20] to [5, 10, 20]`. The player ship spawns stuck in a wall.
+
+**Root Cause:**  
+Level 4 JSON was authored with a central wall that overlaps the player start position at the origin.
+
+**Fix:**  
+- Removed the central wall from level 4 (the `[-5, 0, -20] to [5, 10, 20]` wall) and replaced it with two smaller walls that leave the center clear
+- Added validation in `LevelLoader.validateLevelData()` that checks playerStart is not inside any wall AABB
+
+**Files Changed:**
+- `levels/level4.json` — Replaced central wall with two offset walls
+- `LevelLoader.js` — Added wall-overlap validation for playerStart

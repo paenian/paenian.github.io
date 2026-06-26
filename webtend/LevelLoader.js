@@ -109,6 +109,43 @@ export function validateLevelData(data) {
     }
   }
 
+  // Validate playerStart is not inside any wall
+  if (data.walls && data.playerStart) {
+    const ps = data.playerStart;
+    for (let i = 0; i < data.walls.length; i++) {
+      const w = data.walls[i];
+      const min = w.min;
+      const max = w.max;
+      if (ps[0] >= min[0] && ps[0] <= max[0] &&
+          ps[1] >= min[1] && ps[1] <= max[1] &&
+          ps[2] >= min[2] && ps[2] <= max[2]) {
+        throw new LevelConfigError(
+          `playerStart [${ps}] is inside wall ${i} (min: [${min}], max: [${max}])`
+        );
+      }
+    }
+  }
+
+  // Validate no generator is inside any wall
+  if (data.walls && data.generators) {
+    for (let gi = 0; gi < data.generators.length; gi++) {
+      const gen = data.generators[gi];
+      const pos = gen.position;
+      for (let wi = 0; wi < data.walls.length; wi++) {
+        const w = data.walls[wi];
+        const min = w.min;
+        const max = w.max;
+        if (pos[0] >= min[0] && pos[0] <= max[0] &&
+            pos[1] >= min[1] && pos[1] <= max[1] &&
+            pos[2] >= min[2] && pos[2] <= max[2]) {
+          throw new LevelConfigError(
+            `Generator "${gen.id}" at [${pos}] is inside wall ${wi} (min: [${min}], max: [${max}])`
+          );
+        }
+      }
+    }
+  }
+
   return data;
 }
 
