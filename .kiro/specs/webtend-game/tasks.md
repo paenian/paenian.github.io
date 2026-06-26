@@ -134,8 +134,8 @@ Implement a browser-based 3D action game under `/webtend/` as pure ES modules se
     - _Requirements: 4.3, 4.6_
 
 - [x] 11. Implement `EnemyAI.js`
-  - Implement `EnemyAI.update(enemy, playerPos, walls, dt)`: compute seek direction as `normalize(playerPos - enemy.position) × enemySpeed`; add wall-avoidance repulsion for any wall within `avoidRadius`; clamp combined velocity to `maxSpeed`; mutate `enemy.velocity` with the result
-  - Implement `EnemyAI.seek(enemy, target)` and `EnemyAI.avoidWalls(enemy, walls)` as separate helpers
+  - Implement `EnemyAI` class with straight-line movement and wall reflection: `computeSpawnHeading(spawnPos, playerPos)` returns a unit heading vector from generator toward player at spawn time; `update(enemy, playerPos, walls, dt)` moves the enemy along its fixed `heading` at `enemySpeed`, checks sphere-AABB wall collisions, reflects heading on impact, and pushes position out of walls
+  - Implement `reflect(velocity, normal)` and `checkWallCollision(pos, radius, aabb)` as helper methods on the class
   - _Requirements: 3.2_
 
 - [x] 12. Implement `ExplosionSystem.js` full class with FIFO queue

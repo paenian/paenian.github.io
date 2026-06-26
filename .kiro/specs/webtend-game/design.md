@@ -32,7 +32,7 @@ The game is split into focused ES modules with no circular dependencies. Each mo
 ├── InputHandler.js      # Keyboard state map + pointer lock mouse delta
 ├── Physics.js           # Velocity update, wall reflection, sphere-sphere collision
 ├── ExplosionSystem.js   # Click handler, radius calc, BFS chain reaction queue
-├── EnemyAI.js           # Steering behavior: seek player, wall avoidance
+├── EnemyAI.js           # Straight-line movement with wall reflection
 ├── HUD.js               # DOM manipulation for power bar, generator bars, level
 ├── LevelLoader.js       # Fetch + validate JSON level configs
 ├── levels/
@@ -141,15 +141,16 @@ Wall AABBs are stored as `{ min: {x,y,z}, max: {x,y,z} }` in the level data and 
 ```js
 class ExplosionSystem {
   constructor(gameState, config)
+  setRenderer(renderer)                    // set renderer reference for visual effects
   onPlayerClick(shipPosition)              // entry point: triggers initial explosion
   processExplosion(center, radius)         // collect all hits, enqueue chains
-  step()                                   // process one chain link per frame
+  step()                                   // process one chain link per frame; spawns visual effects via renderer
   calcRadius(powerLevel)                   // base_radius + powerLevel × radius_multiplier
   countChainLength()                       // returns current chain depth counter
 }
 ```
 
-Chain reaction processing uses a FIFO queue (plain array). `onPlayerClick` enqueues the first explosion. Each call to `processExplosion` collects all enemy and generator hits synchronously within the current explosion sphere, removes those entities, then enqueues a new explosion at each destroyed enemy's last position. The queue is drained one entry per frame to give the renderer time to show each visual effect.
+Chain reaction processing uses a FIFO queue (plain array). `onPlayerClick` enqueues the first explosion. Each call to `processExplosion` collects all enemy and generator hits synchronously within the current explosion sphere, removes those entities, then enqueues a new explosion at each destroyed enemy's last position. The queue is drained one entry per frame via `step()`, which also calls `renderer.spawnExplosionEffect()` for each dequeued explosion (both initial and chain) to render the visual effect. The renderer reference is set post-construction via `setRenderer()` to avoid circular dependencies.
 
 **Chain length tracking:** A counter is incremented for each link beyond the first. When the queue drains (chain ends), if counter ≥ threshold, `GameState.powerLevel` is incremented.
 
@@ -157,20 +158,21 @@ Chain reaction processing uses a FIFO queue (plain array). `onPlayerClick` enque
 
 ```js
 class EnemyAI {
-  constructor(gameState, config)
-  update(enemy, playerPos, walls, dt)  // mutates enemy.velocity
-  seek(enemy, target)                  // returns normalized direction toward target
-  avoidWalls(enemy, walls)             // apply repulsion from nearby walls
+  constructor(config)
+  computeSpawnHeading(spawnPos, playerPos)  // returns unit direction vector
+  reflect(velocity, normal)                 // returns reflected velocity vector
+  checkWallCollision(pos, radius, aabb)     // returns { hit, normal, depth }
+  update(enemy, playerPos, walls, dt)       // moves enemy along heading, bounces off walls
 }
 ```
 
-Steering is a simple seek behavior: desired velocity = normalize(player - enemy) × maxSpeed. Wall avoidance adds a repulsion vector away from any wall closer than `avoidRadius` units. The combined velocity is clamped to `maxSpeed`. This is intentionally simple — the maze structure naturally channels enemy movement.
+Enemy movement uses straight-line travel with wall reflection. At spawn time, each enemy receives a fixed `heading` direction pointing from the generator position toward the player's current position. The `update()` method moves the enemy along that heading at `enemySpeed`. When the enemy's bounding sphere collides with a wall AABB, the heading vector is reflected off the wall normal (v' = v - 2(v·n)n) and the position is pushed out of the wall by the penetration depth. The enemy never changes course except on wall bounce — no homing or pathfinding.
 
 ### LevelLoader.js — Config Validation
 
 ```js
 async function loadLevel(index)      // fetch levels/levelN.json, validate, return LevelData
-function validateLevelData(data)     // throws on invalid config, returns validated object
+function validateLevelData(data)     // throws on invalid config; checks wall overlaps for playerStart & generators
 ```
 
 Level JSON schema:
@@ -247,8 +249,10 @@ The HUD is a fixed-position CSS overlay rendered entirely in the DOM (no canvas 
   id: string,
   position: { x, y, z },
   velocity: { x, y, z },
+  heading: { x, y, z },       // fixed direction set at spawn time (unit vector)
   radius: number,              // bounding sphere radius
   mesh: THREE.Mesh,            // reference to scene object
+  pendingRemoval: boolean,     // flagged for end-of-frame removal
 }
 
 // Generator
@@ -412,6 +416,10 @@ In `main.js`, before any Three.js import is used, call `document.createElement('
 ### Invalid Level Config (Requirement 7.2)
 
 `validateLevelData()` checks all required fields and ranges. If validation fails, it throws a typed `LevelConfigError`. `Game.loadLevel()` catches this, shows the error UI, and leaves `GameState.levelIndex` unchanged.
+
+### Generator/Player Inside Wall (Requirements 6.4, BUG-3, BUG-4)
+
+`validateLevelData()` checks that no generator position falls inside any wall AABB, and that `playerStart` is not inside any wall AABB. If either condition is violated, a `LevelConfigError` is thrown with a descriptive message identifying the offending entity and wall index.
 
 ### Floating-Point Velocity Micro-Drift (Requirement 6.6)
 
