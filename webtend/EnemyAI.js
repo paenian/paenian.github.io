@@ -1,4 +1,4 @@
-// EnemyAI.js — Steering behavior: seek player, avoid walls.
+// EnemyAI.js — Enemy movement: straight-line with wall reflection.
 // All vectors are plain { x, y, z } objects — no Three.js dependency.
 
 // ---------------------------------------------------------------------------
@@ -25,6 +25,10 @@ function sub(a, b) {
 
 function scale(v, s) {
   return { x: v.x * s, y: v.y * s, z: v.z * s };
+}
+
+function dot(a, b) {
+  return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 // ---------------------------------------------------------------------------
@@ -57,70 +61,93 @@ export class EnemyAI {
   }
 
   /**
-   * Compute desired velocity toward a target (seek steering).
-   * Returns the desired velocity vector (direction × enemySpeed).
-   * @param {{ position: {x,y,z} }} enemy
-   * @param {{ x,y,z }} target
-   * @returns {{ x,y,z }}
+   * Compute the initial heading for a newly spawned enemy.
+   * Direction is from the spawn position toward the player's current position.
+   * If spawn and player are at the same position, pick a random direction.
+   * @param {{ x,y,z }} spawnPos
+   * @param {{ x,y,z }} playerPos
+   * @returns {{ x,y,z }} unit direction vector
    */
-  seek(enemy, target) {
-    const diff = sub(target, enemy.position);
-    const dir = normalize(diff);
-    return scale(dir, this.config.enemySpeed);
+  computeSpawnHeading(spawnPos, playerPos) {
+    const diff = sub(playerPos, spawnPos);
+    const m = magnitude(diff);
+    if (m < 1e-6) {
+      // Random direction on XZ plane
+      const angle = Math.random() * Math.PI * 2;
+      return { x: Math.cos(angle), y: 0, z: Math.sin(angle) };
+    }
+    return normalize(diff);
   }
 
   /**
-   * Compute wall-avoidance repulsion vector.
-   * For each wall (AABB with min/max), find closest point to enemy;
-   * if distance < avoidRadius, add repulsion away from wall scaled by
-   * (avoidRadius - distance) / avoidRadius * enemySpeed.
-   * @param {{ position: {x,y,z} }} enemy
-   * @param {Array<{ min: {x,y,z}, max: {x,y,z} }>} walls
+   * Reflect a velocity vector off a wall normal.
+   * v' = v - 2(v·n)n
+   * @param {{ x,y,z }} velocity
+   * @param {{ x,y,z }} normal — unit vector
    * @returns {{ x,y,z }}
    */
-  avoidWalls(enemy, walls) {
-    const avoidRadius = this.config.avoidRadius;
-    let repulsion = { x: 0, y: 0, z: 0 };
+  reflect(velocity, normal) {
+    const d = dot(velocity, normal);
+    return {
+      x: velocity.x - 2 * d * normal.x,
+      y: velocity.y - 2 * d * normal.y,
+      z: velocity.z - 2 * d * normal.z,
+    };
+  }
 
-    for (const wall of walls) {
-      const closest = closestPointOnAABB(enemy.position, wall);
-      const diff = sub(enemy.position, closest);
-      const distance = magnitude(diff);
+  /**
+   * Check if enemy sphere overlaps an AABB wall.
+   * @param {{ x,y,z }} pos — enemy center
+   * @param {number} radius — enemy radius
+   * @param {{ min: {x,y,z}, max: {x,y,z} }} aabb
+   * @returns {{ hit: boolean, normal: {x,y,z}, depth: number }}
+   */
+  checkWallCollision(pos, radius, aabb) {
+    const closest = closestPointOnAABB(pos, aabb);
+    const diff = sub(pos, closest);
+    const distance = magnitude(diff);
 
-      if (distance < avoidRadius && distance > 0) {
-        // Repulsion direction: away from the wall (from closest point toward enemy)
-        const dir = normalize(diff);
-        const strength = ((avoidRadius - distance) / avoidRadius) * this.config.enemySpeed;
-        repulsion = add(repulsion, scale(dir, strength));
-      }
+    if (distance >= radius) {
+      return { hit: false, normal: { x: 0, y: 0, z: 0 }, depth: 0 };
     }
 
-    return repulsion;
+    let normal;
+    if (distance < 1e-10) {
+      normal = { x: 0, y: 1, z: 0 }; // fallback
+    } else {
+      normal = normalize(diff);
+    }
+
+    return { hit: true, normal, depth: radius - distance };
   }
 
   /**
-   * Update enemy velocity and position using seek + wall avoidance.
-   * @param {{ position: {x,y,z}, velocity: {x,y,z} }} enemy — mutated in place
-   * @param {{ x,y,z }} playerPos
+   * Update enemy: move in a straight line along its heading, bounce off walls.
+   * Enemy must have a `heading` property (unit vector) set at spawn time.
+   * @param {{ position: {x,y,z}, velocity: {x,y,z}, heading: {x,y,z}, radius: number }} enemy — mutated in place
+   * @param {{ x,y,z }} playerPos — not used for movement (kept for API compatibility)
    * @param {Array<{ min: {x,y,z}, max: {x,y,z} }>} walls
    * @param {number} dt — delta time in seconds
    */
   update(enemy, playerPos, walls, dt) {
-    const seekVec = this.seek(enemy, playerPos);
-    const avoidVec = this.avoidWalls(enemy, walls);
+    // Move along heading at enemySpeed
+    enemy.velocity = scale(enemy.heading, this.config.enemySpeed);
 
-    const combined = add(seekVec, avoidVec);
-    const combinedMag = magnitude(combined);
-
-    let finalVelocity;
-    if (combinedMag === 0) {
-      finalVelocity = { x: 0, y: 0, z: 0 };
-    } else {
-      const speed = Math.min(combinedMag, this.config.enemySpeed);
-      finalVelocity = scale(normalize(combined), speed);
-    }
-
-    enemy.velocity = finalVelocity;
+    // Update position
     enemy.position = add(enemy.position, scale(enemy.velocity, dt));
+
+    // Check wall collisions and bounce
+    const enemyRadius = enemy.radius || 1.0;
+    for (const wall of walls) {
+      const result = this.checkWallCollision(enemy.position, enemyRadius, wall);
+      if (result.hit) {
+        // Reflect heading off the wall
+        enemy.heading = normalize(this.reflect(enemy.heading, result.normal));
+        // Push out of wall
+        enemy.position = add(enemy.position, scale(result.normal, result.depth));
+        // Update velocity to match new heading
+        enemy.velocity = scale(enemy.heading, this.config.enemySpeed);
+      }
+    }
   }
 }

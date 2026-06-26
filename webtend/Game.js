@@ -164,6 +164,7 @@ export class Game {
           id: `enemy-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
           position: { ...gen.position },
           velocity: { x: 0, y: 0, z: 0 },
+          heading: this.enemyAI.computeSpawnHeading(gen.position, playerShip.position),
           radius: 1.0,
           mesh: null,
           pendingRemoval: false,
