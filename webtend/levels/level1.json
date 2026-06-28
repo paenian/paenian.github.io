@@ -21,8 +21,8 @@
     "powerDecrement": 1,
     "maxPower": 100,
     "enemySpeed": 8,
-    "playerMaxSpeed": 50,
-    "playerAcceleration": 20,
-    "decelerationTime": 0.5
+    "playerMaxSpeed": 100,
+    "playerAcceleration": 200,
+    "decelerationTime": 0.05
   }
 }

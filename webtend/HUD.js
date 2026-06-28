@@ -32,6 +32,13 @@ export class HUD {
     const pct = ((current / max) * 100).toFixed(1) + '%';
     if (this._.powerBarFill)  this._.powerBarFill.style.width = pct;
     if (this._.powerBarValue) this._.powerBarValue.textContent = String(current);
+    if (this._.powerBarFill) {
+      if (current <= 1) {
+        this._.powerBarFill.classList.add('power-critical');
+      } else {
+        this._.powerBarFill.classList.remove('power-critical');
+      }
+    }
   }
 
   /**

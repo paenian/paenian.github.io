@@ -208,3 +208,177 @@ export function snapSmallComponent(vel, threshold) {
     z: Math.abs(vel.z) < limit ? 0 : vel.z,
   };
 }
+
+/**
+ * Find the closest pair of points between two 3D line segments.
+ * Segment 1: P(s) = p1 + s*d1 for s ∈ [0,1]
+ * Segment 2: Q(t) = p2 + t*d2 for t ∈ [0,1]
+ * @param {{ x,y,z }} p1 - Start of segment 1
+ * @param {{ x,y,z }} d1 - Direction vector of segment 1 (end - start)
+ * @param {{ x,y,z }} p2 - Start of segment 2
+ * @param {{ x,y,z }} d2 - Direction vector of segment 2 (end - start)
+ * @returns {{ point1: {x,y,z}, point2: {x,y,z}, distance: number }}
+ */
+export function closestPointsOnSegments(p1, d1, p2, d2) {
+  const r = sub(p1, p2);
+  const a = dot(d1, d1); // |d1|²
+  const e = dot(d2, d2); // |d2|²
+  const f = dot(d2, r);
+
+  // Handle degenerate segments (zero-length)
+  if (a < 1e-10 && e < 1e-10) {
+    return { point1: { ...p1 }, point2: { ...p2 }, distance: magnitude(r) };
+  }
+  if (a < 1e-10) {
+    const t = Math.max(0, Math.min(1, f / e));
+    const point2 = add(p2, scale(d2, t));
+    return { point1: { ...p1 }, point2, distance: magnitude(sub(p1, point2)) };
+  }
+
+  const c = dot(d1, r);
+  if (e < 1e-10) {
+    const s = Math.max(0, Math.min(1, -c / a));
+    const point1 = add(p1, scale(d1, s));
+    return { point1, point2: { ...p2 }, distance: magnitude(sub(point1, p2)) };
+  }
+
+  // General case: both segments non-degenerate
+  const b = dot(d1, d2);
+  const denom = a * e - b * b;
+
+  let s, t;
+  if (Math.abs(denom) < 1e-10) {
+    // Segments are parallel — pick s=0, solve for t
+    s = 0;
+    t = f / e;
+  } else {
+    s = (b * f - c * e) / denom;
+    t = (a * f - b * c) / denom;
+  }
+
+  // Clamp s to [0,1] and recompute t, then clamp t and recompute s
+  s = Math.max(0, Math.min(1, s));
+  t = (b * s + f) / e;
+
+  if (t < 0) {
+    t = 0;
+    s = Math.max(0, Math.min(1, -c / a));
+  } else if (t > 1) {
+    t = 1;
+    s = Math.max(0, Math.min(1, (b - c) / a));
+  }
+
+  const point1 = add(p1, scale(d1, s));
+  const point2 = add(p2, scale(d2, t));
+  return { point1, point2, distance: magnitude(sub(point1, point2)) };
+}
+
+/**
+ * Check two oriented capsules for intersection.
+ * Each capsule is defined by: center, heading (unit), halfLength, and radius.
+ * The capsule axis runs from center - halfLength*heading to center + halfLength*heading.
+ * @param {{ x,y,z }} pos1
+ * @param {{ x,y,z }} heading1
+ * @param {number} halfLen1
+ * @param {number} radius1
+ * @param {{ x,y,z }} pos2
+ * @param {{ x,y,z }} heading2
+ * @param {number} halfLen2
+ * @param {number} radius2
+ * @returns {{ hit: boolean, normal: {x,y,z}, depth: number }}
+ */
+export function checkCapsuleCapsule(pos1, heading1, halfLen1, radius1, pos2, heading2, halfLen2, radius2) {
+  // Build segment endpoints
+  const seg1Start = sub(pos1, scale(heading1, halfLen1));
+  const seg1Dir = scale(heading1, halfLen1 * 2);
+  const seg2Start = sub(pos2, scale(heading2, halfLen2));
+  const seg2Dir = scale(heading2, halfLen2 * 2);
+
+  // Find closest points between the two axis segments
+  const { point1, point2, distance } = closestPointsOnSegments(seg1Start, seg1Dir, seg2Start, seg2Dir);
+
+  const combinedRadius = radius1 + radius2;
+
+  if (distance >= combinedRadius) {
+    return { hit: false, normal: { x: 0, y: 0, z: 0 }, depth: 0 };
+  }
+
+  // Contact normal: from point1 toward point2
+  let normal;
+  if (distance < 1e-10) {
+    // Coincident closest points — choose a normal perpendicular to the shared axis
+    // Try cross product of headings to get a separation direction
+    const cross = {
+      x: heading1.y * heading2.z - heading1.z * heading2.y,
+      y: heading1.z * heading2.x - heading1.x * heading2.z,
+      z: heading1.x * heading2.y - heading1.y * heading2.x,
+    };
+    const crossMag = magnitude(cross);
+    if (crossMag > 1e-6) {
+      normal = { x: cross.x / crossMag, y: cross.y / crossMag, z: cross.z / crossMag };
+    } else {
+      // Headings are parallel — pick an arbitrary perpendicular direction
+      // Find a vector not parallel to heading1
+      const ref = Math.abs(heading1.x) < 0.9 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+      const perp = {
+        x: heading1.y * ref.z - heading1.z * ref.y,
+        y: heading1.z * ref.x - heading1.x * ref.z,
+        z: heading1.x * ref.y - heading1.y * ref.x,
+      };
+      normal = normalize(perp);
+    }
+  } else {
+    normal = normalize(sub(point2, point1));
+  }
+
+  return { hit: true, normal, depth: combinedRadius - distance };
+}
+
+/**
+ * Compute heading-dependent deflection for an enemy-enemy collision.
+ * @param {{ x,y,z }} heading - Current heading (unit vector)
+ * @param {{ x,y,z }} contactNormal - Contact normal (points away from this enemy)
+ * @param {number} enemySpeed - Constant enemy speed
+ * @returns {{ heading: {x,y,z}, velocity: {x,y,z} }}
+ */
+export function computeDeflection(heading, contactNormal, enemySpeed) {
+  const DEFLECTION_STRENGTH = 0.3;
+
+  // noseFactor: how head-on is the contact? 1.0 = nose-on, 0.0 = side
+  const noseFactor = Math.abs(dot(heading, contactNormal));
+
+  // Full reflection: v - 2(v·n)n
+  const fullReflection = reflect(heading, contactNormal);
+
+  // Partial deflection: heading + strength * normal, then normalize
+  const partial = normalize(add(heading, scale(contactNormal, DEFLECTION_STRENGTH)));
+
+  // Blend based on noseFactor: lerp(partial, fullReflection, noseFactor)
+  const blended = {
+    x: partial.x * (1 - noseFactor) + fullReflection.x * noseFactor,
+    y: partial.y * (1 - noseFactor) + fullReflection.y * noseFactor,
+    z: partial.z * (1 - noseFactor) + fullReflection.z * noseFactor,
+  };
+
+  const newHeading = normalize(blended);
+  const velocity = scale(newHeading, enemySpeed);
+
+  return { heading: newHeading, velocity };
+}
+
+/**
+ * Slide velocity along a wall surface by removing the perpendicular component.
+ * result = velocity - (velocity · wallNormal) * wallNormal
+ * This zeros the component perpendicular to the wall while preserving the parallel component.
+ * @param {{ x: number, y: number, z: number }} velocity
+ * @param {{ x: number, y: number, z: number }} wallNormal — must be a unit vector
+ * @returns {{ x: number, y: number, z: number }}
+ */
+export function wallSlide(velocity, wallNormal) {
+  const d = dot(velocity, wallNormal);
+  return {
+    x: velocity.x - d * wallNormal.x,
+    y: velocity.y - d * wallNormal.y,
+    z: velocity.z - d * wallNormal.z,
+  };
+}

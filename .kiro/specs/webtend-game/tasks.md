@@ -198,3 +198,154 @@ Implement a browser-based 3D action game under `/webtend/` as pure ES modules se
   ]
 }
 ```
+
+
+---
+
+## Bugfix: Player Movement and Collision Overhaul (Bullet-Hell Style)
+
+_Spec: `.kiro/specs/player-movement-and-collision-fix/bugfix.md`_
+
+Fixes: Enemies survive player contact (should be destroyed), slow acceleration-based movement (should be fast/responsive), wall bounce (should slide), enemy knockback (should have none).
+
+- [x] 17. Write bug condition exploration tests for movement/collision
+  - Test file: `tests/movementCollisionBugCondition.test.js`
+  - Test 1: Enemy contacts player → assert enemy is destroyed (pendingRemoval=true) — will FAIL on unfixed code
+  - Test 2: Enemy contacts player → assert player velocity is unchanged (no knockback) — will FAIL
+  - Test 3: Player movement with acceleration=200, maxSpeed=100 reaches near-max in 0.5s — will FAIL with current config (accel=20, max=50)
+  - Test 4: Player wall collision → assert perpendicular velocity component is 0 (slide) — will FAIL (currently reflects/bounces)
+  - Test 5: Deceleration from max speed to stop in ≤0.05s — will FAIL (currently 0.5s)
+  - **EXPECTED**: Tests FAIL on unfixed code
+  - _Requirements: 1.1–1.6 from bugfix spec_
+
+- [x] 18. Write preservation tests for movement/collision
+  - Test file: `tests/movementCollisionPreservation.test.js`
+  - Test: Explosion chain reactions still destroy enemies and trigger chains
+  - Test: Enemy wall bounce (heading reflection) still works
+  - Test: Generator spawning and HP decrement unchanged
+  - Test: Power level gain from chain threshold unchanged
+  - **EXPECTED**: Tests PASS on unfixed code
+  - _Requirements: 3.1–3.7 from bugfix spec_
+
+- [x] 19. Implement player movement and collision fixes
+  - [x] 19.1 Add `wallSlide(velocity, wallNormal)` to Physics.js — zeros perpendicular component, preserves parallel
+  - [x] 19.2 Update Game.js wall collision: replace `Physics.reflect()` with `Physics.wallSlide()` for player only; push out by penetration depth
+  - [x] 19.3 Update Game.js enemy collision: destroy enemy on contact (set `pendingRemoval=true`), decrement power, do NOT deflect player velocity, do NOT deflect enemy
+  - [x] 19.4 Update level configs (levels/level1-5.json): set `playerAcceleration: 200`, `playerMaxSpeed: 100`, `decelerationTime: 0.05`
+  - [x] 19.5 Update Physics property tests: add Property for wall slide (perpendicular=0, parallel preserved) alongside existing reflect tests
+  - [x] 19.6 Verify bug condition tests (task 17) now pass
+  - [x] 19.7 Verify preservation tests (task 18) still pass
+
+- [x] 20. Checkpoint — movement/collision fix tests all pass
+  - Run full test suite: `cd /Users/paulchase/github/paenian.github.io/webtend && npx vitest --run`
+
+---
+
+## Bugfix: Power-Zero Game-Over Explosion
+
+_Spec: `.kiro/specs/power-zero-game-over-explosion/bugfix.md` + `design.md`_
+
+Fixes: Power clamped to min 1 (should allow 0), explosions have no cost (should cost 1 power), game-over has no visual payoff (should have dramatic death explosion with chain resolution).
+
+- [x] 21. Write bug condition exploration tests for power-zero
+  - Test file: `tests/powerZeroBugCondition.test.js`
+  - Test 1: Power=1, enemy collision → assert power=0 — will FAIL (floors at 1)
+  - Test 2: Power=5, click explosion → assert power=4 — will FAIL (no cost)
+  - Test 3: Power=1, click, chain fails threshold → assert game-over — will FAIL
+  - Test 4: Game-over → assert death explosion enqueued with max radius — will FAIL
+  - **EXPECTED**: Tests FAIL on unfixed code
+  - _Requirements: 1.1–1.4 from bugfix spec_
+
+- [x] 22. Write preservation tests for power-zero
+  - Test file: `tests/powerZeroPreservation.test.js`
+  - Test: Collision at power>1 still decrements correctly
+  - Test: Explosion radius formula unchanged
+  - Test: Chain reward at threshold unchanged
+  - Test: Level-complete logic unaffected
+  - **EXPECTED**: Tests PASS on unfixed code
+  - _Requirements: 3.1–3.8 from bugfix spec_
+
+- [x] 23. Implement power-zero and game-over explosion
+  - [x] 23.1 GameState.js — Add 'DYING' phase; change power clamp from max(1,...) to max(0,...)
+  - [x] 23.2 ExplosionSystem.js — Add explosion cost: deduct 1 power in onPlayerClick (guard at 0); use pre-deduction power for radius
+  - [x] 23.3 ExplosionSystem.js — Post-chain evaluation: if power=0 and phase=PLAYING, set desperationFailed flag
+  - [x] 23.4 Game.js — Change power floor from 1 to 0; check for game-over after collision
+  - [x] 23.5 Game.js — Rewrite onGameOver(): set phase=DYING, enqueue death explosion (max radius), call renderer.spawnDeathExplosionEffect()
+  - [x] 23.6 Game.js — Handle DYING phase in update(): skip input/movement/spawning, continue explosion steps; transition to GAME_OVER when queue empties; detect desperationFailed flag
+  - [x] 23.7 Renderer.js — Add spawnDeathExplosionEffect(pos, maxRadius, durationMs): slow-expanding sphere (0 → maxRadius over 2500ms), distinct color (0xff2200), opacity 0.7
+  - [x] 23.8 HUD.js — Add 'power-critical' CSS class on power bar when power ≤ 1
+  - [x] 23.9 Verify bug condition tests (task 21) now pass
+  - [x] 23.10 Verify preservation tests (task 22) still pass
+
+- [x] 24. Checkpoint — power-zero fix tests all pass
+  - Run full test suite: `cd /Users/paulchase/github/paenian.github.io/webtend && npx vitest --run`
+
+---
+
+## Bugfix: Enemy-Enemy Collision (Oriented Capsule)
+
+_Spec: `.kiro/specs/enemy-enemy-collision/bugfix.md` + `design.md`_
+
+Fixes: Enemies pass through each other (should collide with oriented capsule geometry and heading-dependent deflection).
+
+- [x] 25. Write bug condition exploration tests for enemy-enemy collision
+  - Test file: `tests/enemyEnemyBugCondition.test.js`
+  - Test 1: Two enemies facing each other 2 units apart → step → assert positions cross (pass-through) — demonstrates bug
+  - Test 2: Two enemies at same position → step → assert no heading change — demonstrates bug
+  - Test 3: After fix, overlapping capsules must deflect — set up for later verification
+  - **EXPECTED**: Tests FAIL on unfixed code (showing enemies pass through)
+  - _Requirements: 1.1–1.3 from bugfix spec_
+
+- [x] 26. Write preservation tests for enemy-enemy collision
+  - Test file: `tests/enemyEnemyPreservation.test.js`
+  - Test: Enemy wall bounce unchanged
+  - Test: Straight-line movement at enemySpeed preserved for isolated enemies
+  - Test: Player-enemy collision unchanged
+  - Test: Explosion hit detection uses bounding sphere (not capsule)
+  - **EXPECTED**: Tests PASS on unfixed code
+  - _Requirements: 3.1–3.7 from bugfix spec_
+
+- [x] 27. Implement enemy-enemy collision
+  - [x] 27.1 GameState.js — Add capsuleHalfLength and capsuleRadius to Enemy typedef
+  - [x] 27.2 Physics.js — Implement `closestPointsOnSegments(p1, d1, p2, d2)`: segment-segment closest point algorithm with clamping
+  - [x] 27.3 Physics.js — Implement `checkCapsuleCapsule(pos1, heading1, halfLen1, radius1, pos2, heading2, halfLen2, radius2)`: returns { hit, normal, depth }
+  - [x] 27.4 Physics.js — Implement `computeDeflection(heading, contactNormal, enemySpeed)`: noseFactor-based blend between full reflect and partial deflection
+  - [x] 27.5 Game.js — Add enemy-enemy collision loop after EnemyAI.update(): nested i/j loop with bounding sphere pre-filter → capsule test → deflection + separation
+  - [x] 27.6 Game.js — Update enemy spawn: add capsuleHalfLength=1.5, capsuleRadius=0.8; adjust bounding sphere radius to enclose capsule (2.3)
+  - [x] 27.7 Write unit tests for closestPointsOnSegments (parallel, perpendicular, skew, degenerate segments)
+  - [x] 27.8 Write unit tests for checkCapsuleCapsule (known hit/miss configurations)
+  - [x] 27.9 Write property-based tests: deflection preserves speed; separation resolves overlap; non-colliding pairs unaffected
+  - [x] 27.10 Verify bug condition tests (task 25) now pass
+  - [x] 27.11 Verify preservation tests (task 26) still pass
+
+- [x] 28. Checkpoint — enemy-enemy collision tests all pass
+  - Run full test suite: `cd /Users/paulchase/github/paenian.github.io/webtend && npx vitest --run`
+
+---
+
+## Bugfix Execution Order
+
+The three bugfix sets should be implemented in this order due to dependencies:
+
+1. **Movement/Collision (tasks 17–20)** — Changes wall collision to slide and enemy contact to destroy. Must be done first because power-zero spec assumes enemies are destroyed on contact.
+2. **Power-Zero (tasks 21–24)** — Changes power floor to 0 and adds death explosion. Depends on enemy-destroy-on-contact from step 1.
+3. **Enemy-Enemy Collision (tasks 25–28)** — Adds oriented capsule collision between enemies. Independent of player mechanics but should be done last to avoid test conflicts.
+
+```json
+{
+  "bugfix_waves": [
+    { "id": "BF1", "tasks": ["17", "18"], "label": "Movement/Collision exploration + preservation tests" },
+    { "id": "BF2", "tasks": ["19.1", "19.2", "19.3", "19.4", "19.5"], "label": "Movement/Collision implementation" },
+    { "id": "BF3", "tasks": ["19.6", "19.7", "20"], "label": "Movement/Collision verification" },
+    { "id": "BF4", "tasks": ["21", "22"], "label": "Power-Zero exploration + preservation tests" },
+    { "id": "BF5", "tasks": ["23.1", "23.2", "23.3", "23.4", "23.7", "23.8"], "label": "Power-Zero implementation (parallel tracks)" },
+    { "id": "BF6", "tasks": ["23.5", "23.6"], "label": "Power-Zero Game.js integration (depends on 23.1-23.4, 23.7)" },
+    { "id": "BF7", "tasks": ["23.9", "23.10", "24"], "label": "Power-Zero verification" },
+    { "id": "BF8", "tasks": ["25", "26"], "label": "Enemy-Enemy exploration + preservation tests" },
+    { "id": "BF9", "tasks": ["27.1", "27.2", "27.3", "27.4"], "label": "Enemy-Enemy Physics implementation" },
+    { "id": "BF10", "tasks": ["27.5", "27.6"], "label": "Enemy-Enemy Game.js integration" },
+    { "id": "BF11", "tasks": ["27.7", "27.8", "27.9"], "label": "Enemy-Enemy unit + property tests" },
+    { "id": "BF12", "tasks": ["27.10", "27.11", "28"], "label": "Enemy-Enemy verification" }
+  ]
+}
+```

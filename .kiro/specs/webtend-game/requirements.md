@@ -2,24 +2,27 @@
 
 ## Introduction
 
-Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pilots a spaceship in a third-person perspective through a semi-open maze, chaining explosive attacks to eliminate enemy ship generators across increasingly difficult levels. The game runs entirely in HTML and JavaScript with no backend, using WebGL (via Three.js or equivalent) for 3D rendering.
+Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pilots a spaceship in a third-person perspective through a semi-open maze, chaining explosive attacks to eliminate enemy ship generators across increasingly difficult levels. The game runs entirely in HTML and JavaScript with no backend, using WebGL (via Three.js or equivalent) for 3D rendering. Movement is fast and responsive in a bullet-hell style, enemies are destroyed on contact with the player, and power management creates meaningful risk/reward tension.
 
 ## Glossary
 
 - **Game**: The Webtend browser-based 3D action game.
 - **Player**: The human controlling the game.
 - **Player_Ship**: The spaceship controlled by the Player.
-- **Enemy_Ship**: A spherical autonomous spacecraft that navigates the maze and damages the Player_Ship on contact.
+- **Enemy_Ship**: An autonomous spacecraft with an oriented capsule collision shape that navigates the maze and damages the Player_Ship on contact.
 - **Generator**: A stationary structure that continuously spawns Enemy_Ships and has a hit point bar. Also called "enemy ship generator."
 - **Explosion**: A spherical area-of-effect event triggered by the Player_Ship's click action or by a chain reaction from another Explosion.
-- **Power_Level**: A numeric value representing the Player_Ship's current strength; it determines Explosion radius and is reduced on contact with Enemy_Ships.
+- **Power_Level**: A numeric value in the range [0, maxPower] representing the Player_Ship's current strength; it determines Explosion radius, is reduced on contact with Enemy_Ships, and is spent on each explosion click. Reaching 0 triggers game-over.
 - **Chain_Reaction**: A sequence of Explosions where each Explosion triggers the next by hitting an Enemy_Ship or another explosive target within its radius.
 - **Maze**: The semi-open three-dimensional play field consisting of walls, open corridors, and Generator placements.
 - **Level**: A single play field configuration with a set of Generators; completing all Levels advances the Player to the next Level with increased difficulty.
 - **Camera**: The third-person viewpoint that follows the Player_Ship and rotates with mouse input.
 - **Renderer**: The WebGL-based rendering subsystem responsible for drawing the 3D scene.
-- **Physics_Engine**: The subsystem responsible for movement, collision detection, and bounce behavior.
+- **Physics_Engine**: The subsystem responsible for movement, collision detection, wall slide (player), wall bounce (enemies), and enemy-enemy deflection.
 - **HUD**: The heads-up display overlay showing Power_Level, Generator health bars, and other game state information.
+- **Oriented_Capsule**: A collision shape defined as a swept sphere along a line segment aligned with an Enemy_Ship's heading direction, with configurable half-length and radius parameters.
+- **Death_Explosion**: A maximum-radius explosion triggered on game-over that expands slowly and can chain-react with nearby enemies before the game-over screen appears.
+- **Desperation_Shot**: Firing an explosion when Power_Level is 1, reducing it to 0 with the chance to recover if the resulting chain meets the reward threshold.
 
 ---
 
@@ -27,19 +30,19 @@ Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pil
 
 ### Requirement 1: Third-Person Camera and Player Ship Control
 
-**User Story:** As a Player, I want to fly my spaceship using keyboard and mouse controls, so that I can navigate the maze and aim attacks.
+**User Story:** As a Player, I want to fly my spaceship using keyboard and mouse controls with fast, responsive bullet-hell movement, so that I can dodge streams of enemies and navigate the maze with precision.
 
 #### Acceptance Criteria
 
 1. THE Player_Ship SHALL be rendered as a visible three-dimensional spaceship model in the scene.
-2. WHEN the Player presses the W key, THE Player_Ship SHALL accelerate in the direction the Camera is facing (relative forward) at a rate of 20 units per second squared up to a maximum speed of 50 units per second.
-3. WHEN the Player presses the S key, THE Player_Ship SHALL accelerate in the direction opposite to the Camera facing direction (relative backward) at a rate of 20 units per second squared up to a maximum speed of 50 units per second.
-4. WHEN the Player presses the A key, THE Player_Ship SHALL accelerate to the left relative to the Camera facing direction at a rate of 20 units per second squared up to a maximum speed of 50 units per second.
-5. WHEN the Player presses the D key, THE Player_Ship SHALL accelerate to the right relative to the Camera facing direction at a rate of 20 units per second squared up to a maximum speed of 50 units per second.
+2. WHEN the Player presses the W key, THE Player_Ship SHALL accelerate in the direction the Camera is facing (relative forward) at a rate of 200 units per second squared up to a maximum speed of 100 units per second.
+3. WHEN the Player presses the S key, THE Player_Ship SHALL accelerate in the direction opposite to the Camera facing direction (relative backward) at a rate of 200 units per second squared up to a maximum speed of 100 units per second.
+4. WHEN the Player presses the A key, THE Player_Ship SHALL accelerate to the left relative to the Camera facing direction at a rate of 200 units per second squared up to a maximum speed of 100 units per second.
+5. WHEN the Player presses the D key, THE Player_Ship SHALL accelerate to the right relative to the Camera facing direction at a rate of 200 units per second squared up to a maximum speed of 100 units per second.
 6. WHEN the Player moves the mouse, THE Camera SHALL rotate around the Player_Ship by the corresponding horizontal and vertical angles, with vertical rotation clamped to a range of -80 to +80 degrees from the horizontal plane.
 7. THE Camera SHALL maintain a fixed offset of 10 units behind and 3 units above the Player_Ship at all times.
-8. WHEN no movement keys are pressed AND the Player_Ship is currently moving, THE Player_Ship SHALL decelerate uniformly to a full stop within 0.5 seconds.
-9. WHEN multiple movement keys are pressed simultaneously, THE Game SHALL resolve the inputs into a normalized net movement direction and accelerate the Player_Ship in that direction so diagonal movement does not exceed the maximum speed of 50 units per second.
+8. WHEN no movement keys are pressed AND the Player_Ship is currently moving, THE Player_Ship SHALL decelerate uniformly to a full stop within 0.05 seconds (near-instant stop).
+9. WHEN multiple movement keys are pressed simultaneously, THE Game SHALL resolve the inputs into a normalized net movement direction and accelerate the Player_Ship in that direction so diagonal movement does not exceed the maximum speed of 100 units per second.
 10. WHEN Maze geometry would place the Camera inside a wall at its default offset position, THE Camera SHALL reposition to the nearest unobstructed point along the line between the Player_Ship and the default offset position, maintaining a minimum distance of 1 unit from the Player_Ship.
 
 ---
@@ -63,17 +66,20 @@ Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pil
 
 ### Requirement 3: Enemy Ships
 
-**User Story:** As a Player, I want to face enemy ships that navigate toward me, so that the game presents a continuous threat.
+**User Story:** As a Player, I want to face enemy ships that navigate toward me, collide realistically with each other, and are destroyed on contact with my ship, so that the game presents a continuous, dynamic threat.
 
 #### Acceptance Criteria
 
 1. THE Enemy_Ship SHALL be rendered as a sphere with directional surface dimples that indicate the Enemy_Ship's heading.
-2. WHEN spawned, THE Enemy_Ship SHALL receive a fixed heading direction pointing from its spawn position toward the Player_Ship's position at the moment of spawning, and SHALL move in a straight line along that heading at a constant speed without changing direction (except when reflecting off Maze walls).
+2. WHEN spawned, THE Enemy_Ship SHALL receive a fixed heading direction pointing from its spawn position toward the Player_Ship's position at the moment of spawning, and SHALL move in a straight line along that heading at a constant speed without changing direction (except when reflecting off Maze walls or deflecting off other Enemy_Ships).
 3. WHEN an Enemy_Ship collides with a Maze wall, THE Physics_Engine SHALL reverse the component of the Enemy_Ship's velocity that is perpendicular to the wall surface while preserving the parallel component and the speed magnitude.
-4. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL reduce the Player_Ship's Power_Level by one unit.
-5. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL deflect both ships away from each other regardless of whether the Power_Level reduction succeeds.
+4. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL destroy the Enemy_Ship (remove from scene with no chain explosion) and reduce the Player_Ship's Power_Level by the configured decrement.
+5. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL NOT apply any velocity change or knockback to the Player_Ship.
 6. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL NOT trigger an Explosion.
-7. IF the Player_Ship's Power_Level reaches zero, THEN THE Game SHALL end the current Level and display a game-over screen.
+7. IF the Player_Ship's Power_Level reaches zero due to enemy contact, THEN THE Game SHALL immediately trigger the game-over death explosion sequence.
+8. WHEN two Enemy_Ships' oriented capsules intersect, THE Physics_Engine SHALL deflect both Enemy_Ships' headings based on the contact geometry, push both apart by the penetration depth, and preserve their constant speed.
+9. WHEN an Enemy_Ship-to-Enemy_Ship collision occurs with contact near the nose (high dot product between heading and contact normal), THE Physics_Engine SHALL apply a full heading reflection; WHEN contact is on the side (low dot product), THE Physics_Engine SHALL apply a smaller angular deflection.
+10. Each Enemy_Ship SHALL have an oriented capsule collision shape aligned along its heading direction, with configurable half-length and radius parameters.
 
 ---
 
@@ -96,16 +102,18 @@ Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pil
 
 ### Requirement 5: Power Level System
 
-**User Story:** As a Player, I want to manage my power level through combat decisions, so that chaining explosions is rewarded and taking hits is punished.
+**User Story:** As a Player, I want to manage my power level through combat decisions — spending power to fire, losing power to enemies, and gaining power through chains — so that every action has meaningful risk and reward.
 
 #### Acceptance Criteria
 
 1. THE Player_Ship SHALL start each Level with a configurable initial Power_Level value in the range 1 to 100 inclusive.
 2. THE Game SHALL use the Power_Level to determine the Explosion radius using the formula: radius = base_radius + (Power_Level × radius_multiplier), where base_radius is a configurable constant greater than zero and radius_multiplier is a configurable constant greater than or equal to zero.
 3. WHEN a Chain_Reaction produces the qualifying number of sequential Explosions, THE Game SHALL increase the Player_Ship's Power_Level by a configurable increment in the range 1 to 10 inclusive, up to a configurable maximum Power_Level of 100.
-4. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL decrease the Player_Ship's Power_Level by a configurable decrement in the range 1 to 10 inclusive.
+4. WHEN an Enemy_Ship contacts the Player_Ship, THE Game SHALL decrease the Player_Ship's Power_Level by a configurable decrement in the range 1 to 10 inclusive, with a minimum floor of 0.
 5. WHEN Power_Level changes for any reason, THE HUD SHALL update the Power_Level numeric display and visual bar within one rendered frame.
-6. IF the Player_Ship's Power_Level drops below one, THEN THE Game SHALL treat Power_Level as one so the Player_Ship retains a minimum Explosion radius.
+6. WHEN the Player clicks to trigger an Explosion, THE Game SHALL deduct 1 from Power_Level (using the pre-deduction value for radius calculation). IF Power_Level is 0, THE Game SHALL NOT allow firing.
+7. WHEN Power_Level reaches zero due to enemy contact, THE Game SHALL immediately trigger the game-over death explosion sequence.
+8. WHEN Power_Level reaches zero due to an explosion click (desperation shot), THE Game SHALL allow the chain reaction to fully resolve before evaluating game-over. IF the chain meets the threshold, power is restored and the Player survives; otherwise, the death explosion sequence triggers.
 
 ---
 
@@ -116,7 +124,7 @@ Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pil
 #### Acceptance Criteria
 
 1. THE Maze SHALL be a three-dimensional structure composed of wall segments and open corridors rendered in the scene.
-2. WHEN the Player_Ship collides with a Maze wall, THE Physics_Engine SHALL reverse the component of the Player_Ship's velocity perpendicular to the wall surface while preserving the parallel component, such that the angle of reflection equals the angle of incidence relative to the wall's surface normal.
+2. WHEN the Player_Ship collides with a Maze wall, THE Physics_Engine SHALL zero out the velocity component perpendicular to the wall surface and preserve the velocity component parallel to the wall surface (slide behavior), and push the Player_Ship out by the penetration depth.
 3. WHEN an Enemy_Ship collides with a Maze wall, THE Physics_Engine SHALL reverse the component of the Enemy_Ship's velocity perpendicular to the wall surface while preserving the parallel component, such that the angle of reflection equals the angle of incidence relative to the wall's surface normal.
 4. THE Maze SHALL contain at least one Generator placement per Level, and each Generator placement SHALL be located in an open corridor area accessible to both the Player_Ship and Enemy_Ships.
 5. THE Maze SHALL include at least one open area with a clear radius of at least five non-overlapping Explosion radii (calculated at the initial Power_Level) to allow Chain_Reactions of at least five Explosions.
@@ -164,3 +172,17 @@ Webtend is a browser-based 3D action game hosted on GitHub Pages. The player pil
 4. THE Game SHALL sustain an average of at least 30 frames per second over any 5-second window on hardware that scores at least tier-2 on the WebGL benchmark at the time of release.
 5. IF the browser does not support WebGL, THEN THE Game SHALL display a message informing the Player that a WebGL-capable browser is required and SHALL NOT attempt to initialize the Renderer.
 6. IF any required game asset fails to load during startup, THEN THE Game SHALL display an error message identifying the failed asset and SHALL NOT attempt to start gameplay.
+
+---
+
+### Requirement 10: Death Explosion Sequence
+
+**User Story:** As a Player, I want my game-over to be dramatic and rewarding, so that even losing feels spectacular.
+
+#### Acceptance Criteria
+
+1. WHEN game-over triggers, THE Game SHALL enter a DYING phase where normal input and spawning are disabled but explosion processing continues.
+2. THE Game SHALL spawn a death explosion centered on the Player_Ship with maximum radius (calculated as if Power_Level were maxPower) that expands slowly over 2-3 seconds.
+3. THE death explosion SHALL be able to trigger chain reactions on any enemies within its radius.
+4. THE Game SHALL display the game-over screen only after all death-explosion chain reactions have fully resolved.
+5. THE death explosion SHALL use a visually distinct effect (different color, higher opacity, slower expansion) compared to normal explosions.

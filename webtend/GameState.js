@@ -28,6 +28,8 @@
  * @property {Vec3}          velocity
  * @property {Vec3}          heading  - Fixed direction set at spawn time (unit vector).
  * @property {number}        radius   - Bounding sphere radius.
+ * @property {number}        [capsuleHalfLength] - Half-length of oriented capsule axis (default 1.5).
+ * @property {number}        [capsuleRadius]     - Radius of oriented capsule swept sphere (default 0.8).
  * @property {THREE.Mesh}    mesh     - Reference to the Three.js scene object.
  * @property {boolean}       [pendingRemoval] - Flagged true during mid-frame removal.
  */
@@ -114,7 +116,7 @@ const GENERATOR_DEFAULT_RADIUS = 2.0;
  * call `reset()` to re-initialize between levels.
  *
  * @type {{
- *   phase: 'LOADING'|'PLAYING'|'PAUSED'|'LEVEL_COMPLETE'|'GAME_OVER',
+ *   phase: 'LOADING'|'PLAYING'|'PAUSED'|'LEVEL_COMPLETE'|'GAME_OVER'|'DYING',
  *   levelIndex: number,
  *   powerLevel: number,
  *   maxPowerLevel: number,
@@ -147,6 +149,8 @@ const GameState = {
 
   chainDepth: 0,
 
+  desperationFailed: false,
+
   /** @type {ExplosionJob[]} */
   explosionQueue: [],
 
@@ -164,8 +168,8 @@ const GameState = {
     this.phase = 'LOADING';
     this.levelIndex = levelData.id;
 
-    // Clamp initial power level to [1, 100] (Requirement 5.1)
-    this.powerLevel = clamp(levelData.initialPowerLevel, 1, 100);
+    // Clamp initial power level to [0, 100] (Requirement 5.1)
+    this.powerLevel = clamp(levelData.initialPowerLevel, 0, 100);
     this.maxPowerLevel = (levelData.config && levelData.config.maxPower) || 100;
 
     // Convert walls from JSON array format to {min,max,normal} objects (Requirement 6.1)
@@ -200,6 +204,7 @@ const GameState = {
 
     // Reset chain tracking (Requirement 2.6)
     this.chainDepth = 0;
+    this.desperationFailed = false;
     this.explosionQueue = [];
   },
 };

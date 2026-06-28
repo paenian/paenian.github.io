@@ -46,6 +46,18 @@ export class Game {
    * @param {number} dt — delta time in seconds
    */
   update(dt) {
+    if (GameState.phase === 'DYING') {
+      // During DYING: skip input/movement/spawning, continue explosion processing
+      this.explosionSystem.step();
+      
+      // When explosion queue empties, transition to GAME_OVER
+      if (GameState.explosionQueue.length === 0) {
+        GameState.phase = 'GAME_OVER';
+        this.hud.showGameOver();
+      }
+      return;
+    }
+
     if (GameState.phase !== 'PLAYING') return;
 
     const config = GameState.config;
@@ -90,8 +102,8 @@ export class Game {
     for (const wall of GameState.walls) {
       const result = Physics.checkSphereAABB(playerShip.position, playerShip.radius, wall);
       if (result.hit) {
-        // Reflect velocity
-        playerShip.velocity = Physics.reflect(playerShip.velocity, result.normal);
+        // Slide along wall (zero perpendicular component, preserve parallel)
+        playerShip.velocity = Physics.wallSlide(playerShip.velocity, result.normal);
         // Snap small components to prevent micro-drift
         playerShip.velocity = Physics.snapSmallComponent(playerShip.velocity, 0.01);
         // Push position out of wall by penetration depth
@@ -111,30 +123,23 @@ export class Game {
         enemy.position, enemy.radius
       );
       if (hitResult.hit) {
-        // Power decrement on collision
-        GameState.powerLevel = Math.max(1, GameState.powerLevel - config.powerDecrement);
+        // Power decrement on collision (floor at 0 — power-zero fix)
+        GameState.powerLevel = Math.max(0, GameState.powerLevel - config.powerDecrement);
 
-        // Deflect player velocity
-        playerShip.velocity = Physics.reflect(playerShip.velocity, hitResult.normal);
+        // Check for game-over after collision
+        if (GameState.powerLevel === 0) {
+          this.onGameOver();
+          return; // Stop processing this frame
+        }
 
-        // Deflect enemy velocity
-        enemy.velocity = {
-          x: -hitResult.normal.x * config.enemySpeed,
-          y: -hitResult.normal.y * config.enemySpeed,
-          z: -hitResult.normal.z * config.enemySpeed,
-        };
+        // Enemy is DESTROYED on contact — no chain explosion, no knockback to player
+        enemy.pendingRemoval = true;
 
-        // Push apart by penetration depth
-        const halfDepth = hitResult.depth / 2;
+        // Push player out of enemy by penetration depth (no velocity change)
         playerShip.position = {
-          x: playerShip.position.x - hitResult.normal.x * halfDepth,
-          y: playerShip.position.y - hitResult.normal.y * halfDepth,
-          z: playerShip.position.z - hitResult.normal.z * halfDepth,
-        };
-        enemy.position = {
-          x: enemy.position.x + hitResult.normal.x * halfDepth,
-          y: enemy.position.y + hitResult.normal.y * halfDepth,
-          z: enemy.position.z + hitResult.normal.z * halfDepth,
+          x: playerShip.position.x - hitResult.normal.x * hitResult.depth,
+          y: playerShip.position.y - hitResult.normal.y * hitResult.depth,
+          z: playerShip.position.z - hitResult.normal.z * hitResult.depth,
         };
       }
     }
@@ -153,8 +158,58 @@ export class Game {
       }
     }
 
+    // --- Enemy-enemy collisions (oriented capsule) ---
+    for (let i = 0; i < GameState.enemies.length; i++) {
+      const ei = GameState.enemies[i];
+      if (ei.pendingRemoval) continue;
+      for (let j = i + 1; j < GameState.enemies.length; j++) {
+        const ej = GameState.enemies[j];
+        if (ej.pendingRemoval) continue;
+
+        // Bounding sphere pre-filter
+        const preFilter = Physics.checkSphereSphere(ei.position, ei.radius, ej.position, ej.radius);
+        if (!preFilter.hit) continue;
+
+        // Oriented capsule-capsule test
+        const capsuleResult = Physics.checkCapsuleCapsule(
+          ei.position, ei.heading, ei.capsuleHalfLength || 1.5, ei.capsuleRadius || 0.8,
+          ej.position, ej.heading, ej.capsuleHalfLength || 1.5, ej.capsuleRadius || 0.8
+        );
+        if (!capsuleResult.hit) continue;
+
+        // Apply heading-dependent deflection
+        const deflectI = Physics.computeDeflection(ei.heading, { x: -capsuleResult.normal.x, y: -capsuleResult.normal.y, z: -capsuleResult.normal.z }, config.enemySpeed);
+        const deflectJ = Physics.computeDeflection(ej.heading, capsuleResult.normal, config.enemySpeed);
+
+        ei.heading = deflectI.heading;
+        ei.velocity = deflectI.velocity;
+        ej.heading = deflectJ.heading;
+        ej.velocity = deflectJ.velocity;
+
+        // Separate by penetration depth
+        const halfDepth = capsuleResult.depth / 2;
+        ei.position = {
+          x: ei.position.x - capsuleResult.normal.x * halfDepth,
+          y: ei.position.y - capsuleResult.normal.y * halfDepth,
+          z: ei.position.z - capsuleResult.normal.z * halfDepth,
+        };
+        ej.position = {
+          x: ej.position.x + capsuleResult.normal.x * halfDepth,
+          y: ej.position.y + capsuleResult.normal.y * halfDepth,
+          z: ej.position.z + capsuleResult.normal.z * halfDepth,
+        };
+      }
+    }
+
     // --- Explosion system step ---
     this.explosionSystem.step();
+
+    // Detect desperation-shot failure
+    if (GameState.desperationFailed) {
+      GameState.desperationFailed = false;
+      this.onGameOver();
+      return;
+    }
 
     // --- Enemy spawning (13.4) ---
     const now = performance.now() / 1000;
@@ -165,7 +220,9 @@ export class Game {
           position: { ...gen.position },
           velocity: { x: 0, y: 0, z: 0 },
           heading: this.enemyAI.computeSpawnHeading(gen.position, playerShip.position),
-          radius: 1.0,
+          radius: 2.3,
+          capsuleHalfLength: 1.5,
+          capsuleRadius: 0.8,
           mesh: null,
           pendingRemoval: false,
         };
@@ -205,11 +262,27 @@ export class Game {
 
   /**
    * 13.5 — onGameOver()
-   * Transition to GAME_OVER and show overlay.
+   * Transition to DYING phase, spawn death explosion, then wait for chain resolution.
    */
   onGameOver() {
-    GameState.phase = 'GAME_OVER';
-    this.hud.showGameOver();
+    GameState.phase = 'DYING';
+    
+    // Calculate max-radius death explosion
+    const maxRadius = GameState.config.baseExplosionRadius + 
+      GameState.config.maxPower * GameState.config.radiusMultiplier;
+    
+    // Enqueue death explosion into the explosion queue
+    GameState.explosionQueue.push({
+      center: { ...playerShip.position },
+      radius: maxRadius,
+      isChain: false,
+      chainDepth: 0,
+    });
+    
+    // Spawn the slow-expanding visual effect
+    if (this.renderer.spawnDeathExplosionEffect) {
+      this.renderer.spawnDeathExplosionEffect(playerShip.position, maxRadius, 2500);
+    }
   }
 
   /**
