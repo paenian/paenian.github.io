@@ -12,6 +12,7 @@ import {
   checkSphereAABB,
   checkSphereSphere,
   snapSmallComponent,
+  wallSlide,
 } from '../Physics.js';
 
 // ---------------------------------------------------------------------------
@@ -424,5 +425,36 @@ describe('Property 8 — power level decrement bounded below by 1', () => {
     expect(Math.max(1, 2 - 10)).toBe(1);
     expect(Math.max(1, 10 - 10)).toBe(1);
     expect(Math.max(1, 11 - 10)).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Feature: webtend-game, Property: Wall Slide zeros perpendicular, preserves parallel
+// Validates: Requirements 1.2
+// ---------------------------------------------------------------------------
+
+describe('wallSlide — perpendicular zeroed, parallel preserved', () => {
+  test('wallSlide zeros perpendicular component for axis-aligned normal', () => {
+    const velocity = { x: 5, y: 0, z: 10 };
+    const normal = { x: 1, y: 0, z: 0 };
+    const result = wallSlide(velocity, normal);
+    expect(result.x).toBeCloseTo(0);
+    expect(result.y).toBeCloseTo(0);
+    expect(result.z).toBeCloseTo(10);
+  });
+
+  test('wallSlide preserves parallel component exactly', () => {
+    fc.assert(fc.property(
+      fc.record({ x: fc.float({ min: -100, max: 100, noNaN: true }), y: fc.float({ min: -100, max: 100, noNaN: true }), z: fc.float({ min: -100, max: 100, noNaN: true }) }),
+      fc.record({ x: fc.float({ min: -1, max: 1, noNaN: true }), y: fc.float({ min: -1, max: 1, noNaN: true }), z: fc.float({ min: -1, max: 1, noNaN: true }) })
+        .filter(n => magnitude(n) > 0.1),
+      (vel, rawNormal) => {
+        const n = normalize(rawNormal);
+        const result = wallSlide(vel, n);
+        // Perpendicular component should be ~0
+        const perp = Math.abs(result.x * n.x + result.y * n.y + result.z * n.z);
+        return perp < 1e-5;
+      }
+    ), { numRuns: 100 });
   });
 });

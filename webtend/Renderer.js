@@ -50,7 +50,7 @@ export class Renderer {
     this.shipMesh = null;
 
     // Debug top-down camera (orthographic)
-    this.debugMode = false;
+    this.debugMode = true;
     const viewSize = 80; // units visible in each direction
     this.debugCamera = new THREE.OrthographicCamera(
       -viewSize, viewSize, viewSize, -viewSize, 0.1, 500
@@ -223,6 +223,43 @@ export class Renderer {
       geometry.dispose();
       material.dispose();
     }, 300);
+  }
+
+  /**
+   * Spawn a slow-expanding death explosion visual effect.
+   * @param {{ x: number, y: number, z: number }} pos
+   * @param {number} maxRadius
+   * @param {number} durationMs
+   */
+  spawnDeathExplosionEffect(pos, maxRadius, durationMs) {
+    const geometry = new THREE.SphereGeometry(1, 24, 24); // unit sphere, scaled over time
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xff2200,
+      transparent: true,
+      opacity: 0.7,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.set(pos.x, pos.y, pos.z);
+    mesh.scale.set(0.01, 0.01, 0.01); // start nearly invisible
+    this.scene.add(mesh);
+
+    const startTime = performance.now();
+    const animate = () => {
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(elapsed / durationMs, 1.0);
+      const currentRadius = maxRadius * progress;
+      mesh.scale.set(currentRadius, currentRadius, currentRadius);
+      material.opacity = 0.7 * (1 - progress * 0.5); // fade slightly over time
+
+      if (progress < 1.0) {
+        requestAnimationFrame(animate);
+      } else {
+        this.scene.remove(mesh);
+        geometry.dispose();
+        material.dispose();
+      }
+    };
+    requestAnimationFrame(animate);
   }
 
   /**

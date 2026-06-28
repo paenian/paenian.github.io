@@ -245,6 +245,511 @@
         "chatSessionId": "sess_6b231b01-44ee-4da9-b3d3-8ddf900f1e2c",
         "timestamp": 1782244164157
       }
+    ],
+    "17. Write bug condition exploration tests for movement/collision": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798001
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608812741
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608982863
+      }
+    ],
+    "18. Write preservation tests for movement/collision": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798035
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608987693
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609106628
+      }
+    ],
+    "19.1 Add `wallSlide(velocity, wallNormal)` to Physics.js — zeros perpendicular component, preserves parallel": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798067
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609114421
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609292503
+      }
+    ],
+    "19.2 Update Game.js wall collision: replace `Physics.reflect()` with `Physics.wallSlide()` for player only; push out by penetration depth": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798093
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609293676
+      }
+    ],
+    "19.3 Update Game.js enemy collision: destroy enemy on contact (set `pendingRemoval=true`), decrement power, do NOT deflect player velocity, do NOT deflect enemy": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798124
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609294985
+      }
+    ],
+    "19.4 Update level configs (levels/level1-5.json): set `playerAcceleration: 200`, `playerMaxSpeed: 100`, `decelerationTime: 0.05`": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798160
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609296088
+      }
+    ],
+    "19.5 Update Physics property tests: add Property for wall slide (perpendicular=0, parallel preserved) alongside existing reflect tests": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798189
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609297668
+      }
+    ],
+    "19.6 Verify bug condition tests (task 17) now pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798218
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609307584
+      }
+    ],
+    "19.7 Verify preservation tests (task 18) still pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798250
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609311469
+      }
+    ],
+    "20. Checkpoint — movement/collision fix tests all pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798275
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609315404
+      }
+    ],
+    "21. Write bug condition exploration tests for power-zero": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798307
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609320760
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609431510
+      }
+    ],
+    "22. Write preservation tests for power-zero": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798334
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609436775
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609562297
+      }
+    ],
+    "23.1 GameState.js — Add 'DYING' phase; change power clamp from max(1,...) to max(0,...)": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798371
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609566119
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609739029
+      }
+    ],
+    "23.2 ExplosionSystem.js — Add explosion cost: deduct 1 power in onPlayerClick (guard at 0); use pre-deduction power for radius": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798398
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609740114
+      }
+    ],
+    "23.3 ExplosionSystem.js — Post-chain evaluation: if power=0 and phase=PLAYING, set desperationFailed flag": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798426
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609741081
+      }
+    ],
+    "23.4 Game.js — Change power floor from 1 to 0; check for game-over after collision": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798456
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609742113
+      }
+    ],
+    "23.5 Game.js — Rewrite onGameOver(): set phase=DYING, enqueue death explosion (max radius), call renderer.spawnDeathExplosionEffect()": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798483
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609743242
+      }
+    ],
+    "23.6 Game.js — Handle DYING phase in update(): skip input/movement/spawning, continue explosion steps; transition to GAME_OVER when queue empties; detect desperationFailed flag": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798523
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609744838
+      }
+    ],
+    "23.7 Renderer.js — Add spawnDeathExplosionEffect(pos, maxRadius, durationMs): slow-expanding sphere (0 → maxRadius over 2500ms), distinct color (0xff2200), opacity 0.7": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798550
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609745813
+      }
+    ],
+    "23.8 HUD.js — Add 'power-critical' CSS class on power bar when power ≤ 1": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798575
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609746764
+      }
+    ],
+    "23.9 Verify bug condition tests (task 21) now pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798606
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609748298
+      }
+    ],
+    "23.10 Verify preservation tests (task 22) still pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798634
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609748538
+      }
+    ],
+    "24. Checkpoint — power-zero fix tests all pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798665
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609749575
+      }
+    ],
+    "25. Write bug condition exploration tests for enemy-enemy collision": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798697
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609759108
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609880259
+      }
+    ],
+    "26. Write preservation tests for enemy-enemy collision": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798724
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609880843
+      }
+    ],
+    "27.1 GameState.js — Add capsuleHalfLength and capsuleRadius to Enemy typedef": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798749
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609884582
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610254710
+      }
+    ],
+    "27.2 Physics.js — Implement `closestPointsOnSegments(p1, d1, p2, d2)`: segment-segment closest point algorithm with clamping": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798774
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610255877
+      }
+    ],
+    "27.3 Physics.js — Implement `checkCapsuleCapsule(pos1, heading1, halfLen1, radius1, pos2, heading2, halfLen2, radius2)`: returns { hit, normal, depth }": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798800
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610257178
+      }
+    ],
+    "27.4 Physics.js — Implement `computeDeflection(heading, contactNormal, enemySpeed)`: noseFactor-based blend between full reflect and partial deflection": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798825
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610258593
+      }
+    ],
+    "27.5 Game.js — Add enemy-enemy collision loop after EnemyAI.update(): nested i/j loop with bounding sphere pre-filter → capsule test → deflection + separation": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798852
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610259593
+      }
+    ],
+    "27.6 Game.js — Update enemy spawn: add capsuleHalfLength=1.5, capsuleRadius=0.8; adjust bounding sphere radius to enclose capsule (2.3)": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798889
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610260758
+      }
+    ],
+    "27.7 Write unit tests for closestPointsOnSegments (parallel, perpendicular, skew, degenerate segments)": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798916
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610261667
+      }
+    ],
+    "27.8 Write unit tests for checkCapsuleCapsule (known hit/miss configurations)": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798949
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610262466
+      }
+    ],
+    "27.9 Write property-based tests: deflection preserves speed; separation resolves overlap; non-colliding pairs unaffected": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608798975
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610263452
+      }
+    ],
+    "27.10 Verify bug condition tests (task 25) now pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608799000
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610264777
+      }
+    ],
+    "27.11 Verify preservation tests (task 26) still pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608799025
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610265471
+      }
+    ],
+    "28. Checkpoint — enemy-enemy collision tests all pass": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782608799052
+      },
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610266376
+      }
+    ],
+    "19. Implement player movement and collision fixes": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609311503
+      }
+    ],
+    "23. Implement power-zero and game-over explosion": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782609748574
+      }
+    ],
+    "27. Implement enemy-enemy collision": [
+      {
+        "executionId": "1b58f365-74ab-48a6-a453-1cee7e24d636",
+        "chatSessionId": "sess_afa4f5e3-62ce-401d-9d36-388e3509545f",
+        "timestamp": 1782610265517
+      }
     ]
   }
 }

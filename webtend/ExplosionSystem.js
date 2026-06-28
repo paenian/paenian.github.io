@@ -26,10 +26,19 @@ export class ExplosionSystem {
    * @param {{ x: number, y: number, z: number }} shipPosition
    */
   onPlayerClick(shipPosition) {
+    // Cannot fire at power 0
+    if (this.gameState.powerLevel === 0) return;
+
+    // Save pre-deduction power for radius calculation
+    const preCostPower = this.gameState.powerLevel;
+
+    // Deduct explosion cost (1 power)
+    this.gameState.powerLevel = Math.max(0, this.gameState.powerLevel - 1);
+
     this.gameState.chainDepth = 0;
     this.gameState.explosionQueue.push({
       center: { ...shipPosition },
-      radius: calcRadius(this.gameState.powerLevel, this.config),
+      radius: calcRadius(preCostPower, this.config),
       isChain: false,
       chainDepth: 0,
     });
@@ -99,6 +108,11 @@ export class ExplosionSystem {
         );
       }
       this.gameState.chainDepth = 0;
+
+      // Post-chain: check for desperation shot failure
+      if (this.gameState.powerLevel === 0 && this.gameState.phase === 'PLAYING') {
+        this.gameState.desperationFailed = true;
+      }
     }
   }
 
